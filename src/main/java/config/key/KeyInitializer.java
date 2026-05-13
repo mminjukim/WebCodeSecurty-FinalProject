@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import main.java.config.database.DBManager;
-import main.java.config.database.DataInitializer;
 import main.java.user.UserRole;
 
 /**
