@@ -3,7 +3,7 @@ package main.java;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
-import main.java.config.lifecycle.ServerLifeCycle;
+import main.java.infrastructure.lifecycle.ServerLifeCycle;
 import main.java.user.UserDto;
 import main.java.user.UserService;
 
@@ -22,7 +22,7 @@ public class DocSystem {
 		while (choice != 'Q') {
 
 			if (loggedInUser == null) {
-				System.out.println("---------------Menu---------------");
+				System.out.println("\n\n---------------Menu---------------");
 				System.out.println("  - 회원가입: [S]ignup");
 				System.out.println("  - 로그인: [L]ogin");
 				System.out.println("  - 프로그램 종료: [Q]uit");
@@ -48,7 +48,7 @@ public class DocSystem {
 				}
 
 			} else {
-				System.out.println("---------------Menu---------------");
+				System.out.println("\n\n---------------Menu---------------");
 				System.out.println("  - 문서 업로드: [U]pload");
 				System.out.println("  - 문서 열람: [R]ead");
 				System.out.println("  - 문서 로그 확인: [H]istory");
