@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import main.java.config.key.KeyInitializer;
+
 /**
  * 데이터 초기화
  */
@@ -60,7 +62,7 @@ public class DataInitializer {
 	 * 역할 데이터를 초기화
 	 */
 	public static final void initializeRoles() {
-		// TODO: 역할 데이터 삽입 후 역할별 각 키도 만들어 저장
+		KeyInitializer.initializeRoleKeys();
 	}
 
 }
