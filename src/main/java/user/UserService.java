@@ -1,18 +1,20 @@
 package main.java.user;
 
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Scanner;
 
-import main.java.config.database.DBManager;
+import main.java.infrastructure.database.DBManager;
+import main.java.infrastructure.key.KeyInitializer;
+import main.java.util.PasswordHasher;
 
 public class UserService {
 
 	private static final UserService instance = new UserService();
 
 	private final UserDao userDao = UserDao.getInstance();
+	private final KeyInitializer keyInitializer = KeyInitializer.getInstance();
 
 	private UserService() {
 	}
@@ -34,10 +36,27 @@ public class UserService {
 
 		System.out.println("\n--------------SignUp--------------");
 
+		// 아이디 입력
 		System.out.print("1. 아이디를 입력하세요: ");
 		String username = scanner.nextLine();
 
-		System.out.print("2. 역할을 입력하세요 (숫자만 입력. 1-인사, 2-영업, 3-재무, 4-법무): ");
+		// 아이디 유효성 체크
+		if (username.trim().isEmpty()) {
+			System.out.println("[오류] 아이디는 필수로 입력해야 합니다.\n");
+			return false;
+		}
+		try {
+			if (userDao.isUsernameExist(conn, username)) {
+				System.out.println("[오류] 이미 사용 중인 아이디입니다.\n");
+				return false;
+			}
+		} catch (SQLException e) {
+			System.out.println("[오류] 아이디 중복 확인 중 오류가 발생했습니다.");
+			return false;
+		}
+
+		// 역할 입력
+		System.out.print("2. 역할을 입력하세요 (숫자만 입력. 1-인사, 2-재무, 3-영업, 4-법무): ");
 		int roleId = 0;
 		try {
 			roleId = Integer.parseInt(scanner.nextLine());
@@ -46,32 +65,37 @@ public class UserService {
 			return false;
 		}
 
+		// 역할 유효성 체크
+		if (roleId < 1 || roleId > 4) {
+			System.out.println("[오류] 역할 번호는 1에서 4 사이여야 합니다.");
+			return false;
+		}
+
+		// 비밀번호 입력
 		System.out.print("3. 비밀번호를 입력하세요: ");
 		String password = scanner.nextLine();
 
 		System.out.print("4. 비밀번호를 다시 입력하세요: ");
 		String confirmPassword = scanner.nextLine();
 
-		System.out.println("----------------------------------\n");
-
+		// 비밀번호 유효성 체크
+		if (password.trim().isEmpty()) {
+			System.out.println("[오류] 비밀번호는 필수 입력값입니다.\n");
+			return false;
+		}
 		if (!password.equals(confirmPassword)) {
 			System.out.println("[오류] 비밀번호가 일치하지 않습니다.");
 			return false;
 		}
-		if (roleId < 1 || roleId > 4) {
-			System.out.println("[오류] 역할 번호는 1에서 4 사이여야 합니다.");
-			return false;
-		}
-		if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-			System.out.println("[오류] 아이디와 비밀번호는 필수로 입력해야 합니다.");
-			return false;
-		}
+
+		System.out.println("----------------------------------\n");
 
 		// 비밀번호 해시
-		MessageDigest md = MessageDigest.getInstance("SHA-256");
-		byte[] hashedPasswd = md.digest(password.getBytes());
+		String hashedPassword = PasswordHasher.hash(password);
+		UserDto newUser = new UserDto(username, hashedPassword, roleId);
 
-		UserDto newUser = new UserDto(username, hashedPasswd, roleId);
+		// 공개키, 비밀키 생성
+		newUser = keyInitializer.initializeUserKeys(newUser);
 
 		try {
 			int result = userDao.insertUser(conn, newUser);
@@ -114,11 +138,10 @@ public class UserService {
 			}
 
 			// 비밀번호 해시
-			MessageDigest md = MessageDigest.getInstance("SHA-256");
-			byte[] hashedInputPassword = md.digest(password.getBytes());
+			String hashedPassword = PasswordHasher.hash(password);
 
-			if (user.getPassword().equals(hashedInputPassword)) {
-				System.out.println("::: 로그인 완료 ::: \n" + user.getUsername() + "님, 환영합니다!");
+			if (user.getPassword().equals(hashedPassword)) {
+				System.out.println("::: 로그인 완료 ::: \n" + user.getUsername() + "님 환영합니다.");
 				return user;
 			} else {
 				System.out.println("[오류] 비밀번호가 일치하지 않습니다.");
