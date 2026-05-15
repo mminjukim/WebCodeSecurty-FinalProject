@@ -1,4 +1,4 @@
-package main.java.config.database;
+package main.java.infrastructure.database;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

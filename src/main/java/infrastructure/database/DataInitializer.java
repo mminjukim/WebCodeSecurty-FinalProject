@@ -1,10 +1,11 @@
-package main.java.config.database;
+package main.java.infrastructure.database;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import main.java.config.key.KeyInitializer;
+import main.java.infrastructure.key.KeyInitializer;
 
 /**
  * 데이터 초기화
@@ -27,7 +28,7 @@ public class DataInitializer {
 				CREATE TABLE IF NOT EXISTS users (
 					id INT AUTO_INCREMENT PRIMARY KEY,
 				    username VARCHAR(50) NOT NULL UNIQUE,
-				    password_hash BLOB NOT NULL,
+				    password_hash VARCHAR(255) NOT NULL,
 				    public_key BLOB NOT NULL,
 				    encrypted_private_key BLOB NOT NULL,
 				    role_id INT NOT NULL,
@@ -62,7 +63,17 @@ public class DataInitializer {
 	 * 역할 데이터를 초기화
 	 */
 	public static final void initializeRoles() {
-		KeyInitializer.initializeRoleKeys();
+		SqlQueryBuilder query = new SqlQueryBuilder().select("count(*)").from("roles");
+		try (Connection conn = DBManager.getConnection()) {
+			ResultSet result = QueryExecutor.executeQuery(conn, query);
+			if (result.next() == true) {
+				return;
+			} else {
+				KeyInitializer.initializeRoleKeys();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

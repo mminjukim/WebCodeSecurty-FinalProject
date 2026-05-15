@@ -1,6 +1,6 @@
-package main.java.config.lifecycle;
+package main.java.infrastructure.lifecycle;
 
-import main.java.config.database.DataInitializer;
+import main.java.infrastructure.database.DataInitializer;
 
 public class ServerLifeCycle {
 
@@ -10,6 +10,7 @@ public class ServerLifeCycle {
 
 	public static final void start() {
 		DataInitializer.createTables();
+		DataInitializer.initializeRoles();
 	}
 
 	public static final void stop() {
