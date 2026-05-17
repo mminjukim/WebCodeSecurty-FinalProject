@@ -1,10 +1,11 @@
-package main.java.config.database;
+package main.java.infrastructure.database;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import main.java.config.key.KeyInitializer;
+import main.java.infrastructure.key.KeyInitializer;
 
 /**
  * 데이터 초기화
@@ -62,7 +63,17 @@ public class DataInitializer {
 	 * 역할 데이터를 초기화
 	 */
 	public static final void initializeRoles() {
-		KeyInitializer.initializeRoleKeys();
+		SqlQueryBuilder query = new SqlQueryBuilder().select("count(*)").from("roles");
+		try (Connection conn = DBManager.getConnection()) {
+			ResultSet result = QueryExecutor.executeQuery(conn, query);
+			if (result.next() == true) {
+				return;
+			} else {
+				KeyInitializer.initializeRoleKeys();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
