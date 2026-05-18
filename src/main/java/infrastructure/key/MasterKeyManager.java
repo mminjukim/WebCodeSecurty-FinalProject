@@ -1,5 +1,6 @@
 package main.java.infrastructure.key;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -43,8 +44,16 @@ public class MasterKeyManager {
 		}
 		keyGen.init(KEY_SIZE);
 		SecretKey secretKey = keyGen.generateKey();
+		
+		File masterKeyFile = new File(MASTER_KEY_PATH);
+	    File parentDir = masterKeyFile.getParentFile();
+	    if (parentDir != null && !parentDir.exists()) {
+	        if (!parentDir.mkdirs()) {
+	            throw new RuntimeException("마스터키 디렉토리 생성중 오류가 발생했습니다.");
+	        }
+	    }
 
-		try (FileOutputStream fos = new FileOutputStream(MASTER_KEY_PATH);
+		try (FileOutputStream fos = new FileOutputStream(masterKeyFile);
 				ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 			oos.writeObject(secretKey);
 		} catch (IOException e) {
