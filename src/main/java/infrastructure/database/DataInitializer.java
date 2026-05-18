@@ -67,9 +67,11 @@ public class DataInitializer {
 		try (Connection conn = DBManager.getConnection()) {
 			ResultSet result = QueryExecutor.executeQuery(conn, query);
 			if (result.next() == true) {
-				return;
-			} else {
-				KeyInitializer.initializeRoleKeys();
+				if (result.getInt(1) > 0) {
+					return;
+				} else {
+					KeyInitializer.initializeRoleKeys();
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
