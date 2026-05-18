@@ -28,7 +28,6 @@ public class MasterKeyManager {
 	}
 
 	public SecretKey initializeMasterKey() {
-
 		if (Files.exists(Paths.get(MASTER_KEY_PATH))) {
 			return loadMasterKey();
 		}
@@ -60,11 +59,10 @@ public class MasterKeyManager {
 				ObjectInputStream ois = new ObjectInputStream(fis)) {
 			Object obj = ois.readObject();
 			SecretKey secretKey = (SecretKey)obj;
-
 			return secretKey;
 
 		} catch (ClassNotFoundException e) {
-			throw new RuntimeException("마스터키 파일을 읽울 수 없습니다.", e);
+			throw new RuntimeException("마스터키 파일을 읽을 수 없습니다.", e);
 		} catch (IOException e) {
 			throw new RuntimeException("마스터키를 로드할 수 없습니다.", e);
 		}
