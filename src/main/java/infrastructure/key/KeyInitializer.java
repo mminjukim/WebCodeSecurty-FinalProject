@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import main.java.infrastructure.database.DBManager;
 import main.java.user.UserDto;
 import main.java.user.UserRole;
+import main.java.util.MasterKeyCryptor;
 
 /**
  * 키 초기화
@@ -26,15 +27,14 @@ public class KeyInitializer {
 	}
 
 	public static void initializeRoleKeys() {
-		KeyPairGenerator keyPairGen;
-
+		KeyPairGenerator keyPairGen = null;
 		try {
 			keyPairGen = KeyPairGenerator.getInstance("RSA");
-			keyPairGen.initialize(2048);
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			System.out.println("[오류] 역할 키 생성 중 오류 발생");
 			return;
-		}
+		}			
+		keyPairGen.initialize(2048);
 
 		String sql = "INSERT INTO roles (role_name, public_key, encrypted_private_key) VALUES (?, ?, ?)";
 		try (Connection conn = DBManager.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -44,11 +44,11 @@ public class KeyInitializer {
 
 				byte[] publicKey = keyPair.getPublic().getEncoded();
 				byte[] privateKey = keyPair.getPrivate().getEncoded();
-				// TODO: 개인키를 AES 마스터키로 암호화 추가
+				byte[] encoded_privateKey = MasterKeyCryptor.masterKeyEncrypt(privateKey);
 
 				pstmt.setString(1, role.name());
 				pstmt.setBytes(2, publicKey);
-				pstmt.setBytes(3, privateKey); // encoded_privateKey로 변경 필요
+				pstmt.setBytes(3, encoded_privateKey);
 
 				pstmt.addBatch();
 			}
