@@ -1,7 +1,6 @@
 package main.java.infrastructure.database;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -11,6 +10,9 @@ import main.java.infrastructure.key.KeyInitializer;
  * 데이터 초기화
  */
 public class DataInitializer {
+
+	private DataInitializer() {
+	}
 
 	/**
 	 * 역할, 사용자, 문서 테이블이 존재하지 않으면 생성
@@ -54,8 +56,7 @@ public class DataInitializer {
 			stmt.executeUpdate(createUsers);
 			stmt.executeUpdate(createDocuments);
 		} catch (SQLException e) {
-			e.printStackTrace();
-			System.exit(1);
+			throw new IllegalStateException("데이터베이스 테이블 생성 중 오류가 발생했습니다.", e);
 		}
 	}
 
@@ -65,16 +66,17 @@ public class DataInitializer {
 	public static final void initializeRoles() {
 		SqlQueryBuilder query = new SqlQueryBuilder().select("count(*)").from("roles");
 		try (Connection conn = DBManager.getConnection()) {
-			ResultSet result = QueryExecutor.executeQuery(conn, query);
-			if (result.next() == true) {
-				if (result.getInt(1) > 0) {
-					return;
-				} else {
-					KeyInitializer.initializeRoleKeys();
+			boolean needsInitialization = QueryExecutor.executeQuery(conn, query, rs -> {
+				if (rs.next()) {
+					return rs.getInt(1) == 0;
 				}
+				return false;
+			});
+			if (needsInitialization) {
+				KeyInitializer.initializeRoleKeys();
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new IllegalStateException("역할 데이터 초기화 중 오류가 발생했습니다.", e);
 		}
 	}
 
