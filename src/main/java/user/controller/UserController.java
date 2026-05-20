@@ -24,16 +24,16 @@ public class UserController {
 		System.out.println("\n--------------SignUp--------------");
 
 		System.out.print("1. 아이디를 입력하세요: ");
-		String username = scanner.nextLine();
+		String username = scanner.next();
 
 		System.out.print("2. 역할을 입력하세요 (숫자만 입력. 1-인사, 2-재무, 3-영업, 4-법무): ");
-		String roleInput = scanner.nextLine();
+		String roleInput = scanner.next();
 
 		System.out.print("3. 비밀번호를 입력하세요: ");
-		String password = scanner.nextLine();
+		String password = scanner.next();
 
 		System.out.print("4. 비밀번호를 다시 입력하세요: ");
-		String confirmPassword = scanner.nextLine();
+		String confirmPassword = scanner.next();
 		System.out.println("----------------------------------\n");
 
 		try {
@@ -56,10 +56,10 @@ public class UserController {
 		System.out.println("\n--------------Login---------------");
 
 		System.out.print("아이디를 입력하세요: ");
-		String username = scanner.nextLine();
+		String username = scanner.next();
 
 		System.out.print("비밀번호를 입력하세요: ");
-		String password = scanner.nextLine();
+		String password = scanner.next();
 		System.out.println("----------------------------------\n");
 
 		if (username.trim().isEmpty() || password.trim().isEmpty()) {
