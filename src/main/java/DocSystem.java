@@ -33,7 +33,12 @@ public class DocSystem {
 				System.out.println("----------------------------------");
 				System.out.print(">> 메뉴를 선택하세요: ");
 
-				choice = scanner.nextLine().toUpperCase().charAt(0);
+				String input = scanner.next().trim();
+				if (input.isEmpty()) {
+					System.out.println("\n[알림] 메뉴를 입력해 주세요.\n");
+					continue;
+				}
+				choice = input.toUpperCase().charAt(0);
 
 				switch (choice) {
 				case 'S':
@@ -61,7 +66,12 @@ public class DocSystem {
 				System.out.println("----------------------------------");
 				System.out.print(">> 메뉴를 선택하세요: ");
 
-				choice = scanner.nextLine().toUpperCase().charAt(0);
+				String input = scanner.next().trim();
+				if (input.isEmpty()) {
+					System.out.println("\n[알림] 메뉴를 입력해 주세요.\n");
+					continue;
+				}
+				choice = input.toUpperCase().charAt(0);
 
 				switch (choice) {
 				case 'U':
