@@ -8,6 +8,9 @@ import java.util.List;
 
 public class QueryExecutor {
 
+	private QueryExecutor() {
+	}
+
 	// 파라미터를 PreparedStatement에 매핑
 	public static void mapParameters(PreparedStatement pstmt, List<Object> parameters) throws SQLException {
 		for (int i = 0; i < parameters.size(); i++) {
@@ -16,10 +19,17 @@ public class QueryExecutor {
 	}
 
 	// SELECT 실행
-	public static ResultSet executeQuery(Connection conn, SqlQueryBuilder builder) throws SQLException {
-		PreparedStatement pstmt = conn.prepareStatement(builder.getQuery());
-		mapParameters(pstmt, builder.getParameters());
-		return pstmt.executeQuery();
+	public static <T> T executeQuery(
+			Connection conn, 
+			SqlQueryBuilder builder, 
+			ResultSetHandler<T> handler) 
+	throws SQLException {
+		try (PreparedStatement pstmt = conn.prepareStatement(builder.getQuery())) {
+			mapParameters(pstmt, builder.getParameters());
+			try (ResultSet rs = pstmt.executeQuery()) {
+				return handler.handle(rs);
+			}
+		}
 	}
 
 	// INSERT, UPDATE 실행
@@ -28,5 +38,11 @@ public class QueryExecutor {
 			mapParameters(pstmt, builder.getParameters());
 			return pstmt.executeUpdate();
 		}
+	}
+
+	// executeQuery 결과 ResultSet 처리용
+	@FunctionalInterface
+	public interface ResultSetHandler<T> {
+		T handle(ResultSet rs) throws SQLException;
 	}
 }

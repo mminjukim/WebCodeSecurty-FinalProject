@@ -35,20 +35,19 @@ public class UserDao {
 				.select(COL_ID, COL_USERNAME, COL_PASSWORD_HASH, COL_ROLE_ID, COL_PUBLIC_KEY, COL_PRIVATE_KEY)
 				.from(TABLE_USERS)
 				.where(COL_USERNAME + " = ?", username);
-
-		try (ResultSet rs = QueryExecutor.executeQuery(conn, builder)) {
+		return QueryExecutor.executeQuery(conn, builder, rs -> {
 			if (rs.next()) {
 				return new UserDto(
-						rs.getLong(COL_ID), 
-						rs.getString(COL_USERNAME), 
+						rs.getLong(COL_ID),
+						rs.getString(COL_USERNAME),
 						rs.getString(COL_PASSWORD_HASH),
-						rs.getString(COL_PUBLIC_KEY), 
-						rs.getString(COL_PRIVATE_KEY), 
+						rs.getString(COL_PUBLIC_KEY),
+						rs.getString(COL_PRIVATE_KEY),
 						rs.getInt(COL_ROLE_ID)
 				);
 			}
-		}
-		return null;
+			return null;
+		});
 	}
 
 	public boolean isUsernameExist(Connection conn, String username) throws SQLException {
@@ -56,9 +55,6 @@ public class UserDao {
 				.select("1")
 				.from(TABLE_USERS)
 				.where(COL_USERNAME + " = ?", username);
-
-		try (ResultSet rs = QueryExecutor.executeQuery(conn, builder)) {
-			return rs.next();
-		}
+		return QueryExecutor.executeQuery(conn, builder, ResultSet::next);
 	}
 }
