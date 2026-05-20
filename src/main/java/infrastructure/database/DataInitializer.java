@@ -20,8 +20,8 @@ public class DataInitializer {
 				CREATE TABLE IF NOT EXISTS roles (
 				    id INT AUTO_INCREMENT PRIMARY KEY,
 				   	role_name VARCHAR(50) NOT NULL UNIQUE,
-				    public_key BLOB NOT NULL,
-				    encrypted_private_key BLOB NOT NULL
+				    public_key VARCHAR(255) NOT NULL,
+				    private_key VARCHAR(255) NOT NULL
 				);
 				""";
 		String createUsers = """
@@ -29,8 +29,8 @@ public class DataInitializer {
 					id INT AUTO_INCREMENT PRIMARY KEY,
 				    username VARCHAR(50) NOT NULL UNIQUE,
 				    password_hash VARCHAR(255) NOT NULL,
-				    public_key BLOB NOT NULL,
-				    encrypted_private_key BLOB NOT NULL,
+				    public_key VARCHAR(255) NOT NULL,
+				    private_key VARCHAR(255) NOT NULL,
 				    role_id INT NOT NULL,
 				    FOREIGN KEY (role_id) REFERENCES roles(id)
 				);
@@ -41,8 +41,8 @@ public class DataInitializer {
 				    title VARCHAR(255) NOT NULL,
 				    uploader_id INT NOT NULL,
 				    role_id INT NOT NULL,
-				    encrypted_content LONGBLOB NOT NULL,
-				    encrypted_secret_key BLOB NOT NULL,
+				    encrypted_content VARCHAR(255) NOT NULL,
+				    secret_key VARCHAR(255) NOT NULL,
 				    encrypted_signature BLOB NOT NULL,
 				    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 				    FOREIGN KEY (uploader_id) REFERENCES users(id) ON DELETE CASCADE,
