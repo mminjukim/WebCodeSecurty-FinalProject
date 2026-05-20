@@ -1,5 +1,6 @@
 package main.java.user.controller;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
 import main.java.user.UserService;
@@ -71,7 +72,11 @@ public class UserController {
 			System.out.println("::: 로그인 완료 ::: \n" + loginUser.getUsername() + "님 환영합니다.");
 			return loginUser;
 
-		} catch (Exception e) {
+		} catch (IllegalArgumentException e) {
+			System.out.println("[오류] " + e.getMessage());
+		} catch (IllegalStateException e) {
+			System.out.println("[오류] " + e.getMessage());
+		} catch (NoSuchAlgorithmException e) {
 			System.out.println("[오류] " + e.getMessage());
 		}
 		return null;
