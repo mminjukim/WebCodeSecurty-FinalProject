@@ -3,21 +3,25 @@ package main.java;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
+import main.java.infrastructure.lifecycle.AppConfig;
 import main.java.infrastructure.lifecycle.ServerLifeCycle;
-import main.java.user.UserDto;
-import main.java.user.UserService;
+import main.java.user.controller.UserController;
+import main.java.user.dto.UserDto;
 
 public class DocSystem {
 
-	private static UserDto loggedInUser = null;
-
 	public static void main(String[] args) throws NoSuchAlgorithmException {
+
+		// 프로그램 시작
 		ServerLifeCycle.start();
-		printWelcome();
 
-		Scanner scanner = new Scanner(System.in);
-		UserService userService = UserService.getInstance();
+		AppConfig appConfig = new AppConfig();
+		UserController userController = appConfig.getUserController();
+		Scanner scanner = appConfig.getScanner();
 
+		UserDto loggedInUser = null;
+
+		// 메뉴 입력
 		char choice = 'A';
 		while (choice != 'Q') {
 
@@ -29,22 +33,27 @@ public class DocSystem {
 				System.out.println("----------------------------------");
 				System.out.print(">> 메뉴를 선택하세요: ");
 
-				choice = scanner.nextLine().toUpperCase().charAt(0);
+				String input = scanner.next().trim();
+				if (input.isEmpty()) {
+					System.out.println("\n[알림] 메뉴를 입력해 주세요.\n");
+					continue;
+				}
+				choice = input.toUpperCase().charAt(0);
 
 				switch (choice) {
 				case 'S':
-					userService.signup(scanner);
+					userController.processSignup();
 					System.out.println();
 					break;
 				case 'L':
-					loggedInUser = userService.login(scanner);
+					loggedInUser = userController.processLogin();
 					System.out.println();
 					break;
 				case 'Q':
 					System.out.println("프로그램을 종료합니다.");
 					break;
 				default:
-					System.out.println("[알림] 올바른 메뉴를 입력해 주세요.\n");
+					System.out.println("\n[알림] 올바른 메뉴를 입력해 주세요.\n");
 				}
 
 			} else {
@@ -57,7 +66,12 @@ public class DocSystem {
 				System.out.println("----------------------------------");
 				System.out.print(">> 메뉴를 선택하세요: ");
 
-				choice = scanner.nextLine().toUpperCase().charAt(0);
+				String input = scanner.next().trim();
+				if (input.isEmpty()) {
+					System.out.println("\n[알림] 메뉴를 입력해 주세요.\n");
+					continue;
+				}
+				choice = input.toUpperCase().charAt(0);
 
 				switch (choice) {
 				case 'U':
@@ -70,56 +84,18 @@ public class DocSystem {
 					// TODO: 로직 추가
 					break;
 				case 'L':
-					System.out.println("[알림] 로그아웃 되었습니다.\n");
+					System.out.println("\n[알림] 로그아웃 되었습니다.\n");
 					loggedInUser = null;
 					break;
 				case 'Q':
 					System.out.println("프로그램을 종료합니다.");
 					break;
 				default:
-					System.out.println("[알림] 올바른 메뉴를 입력해 주세요.\n");
+					System.out.println("\n[알림] 올바른 메뉴를 입력해 주세요.\n");
 				}
 			}
 		}
 
 		scanner.close();
-	}
-
-	private static void printWelcome() {
-		String str = """
-
-				       ************************************************************************
-				       *                                                                      *
-				       *    ██████╗  ██████╗  ██████╗                                         *
-				       *    ██╔══██╗██╔═══██╗██╔════╝                                         *
-				       *    ██║  ██║██║   ██║██║                                              *
-				       *    ██║  ██║██║   ██║██║                                              *
-				       *    ██████╔╝╚██████╔╝╚██████╗██╗                                      *
-				       *    ╚═════╝  ╚═════╝  ╚═════╝╚═╝                                      *
-				       *                                                                      *
-				       *    ███╗   ███╗ █████╗ ███╗   ██╗ █████╗  ██████╗ ███████╗            *
-				       *    ████╗ ████║██╔══██╗████╗  ██║██╔══██╗██╔════╝ ██╔════╝            *
-				       *    ██╔████╔██║███████║██╔██╗ ██║███████║██║  ███╗█████╗              *
-				       *    ██║╚██╔╝██║██╔══██║██║╚██╗██║██╔══██║██║   ██║██╔══╝              *
-				       *    ██║ ╚═╝ ██║██║  ██║██║ ╚████║██║  ██║╚██████╔╝███████╗            *
-				       *    ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝            *
-				       *                                                                      *
-				       *    ███████╗██╗   ██╗███████╗████████╗███████╗███╗   ███╗             *
-				       *    ██╔════╝╚██╗ ██╔╝██╔════╝╚══██╔══╝██╔════╝████╗ ████║             *
-				       *    ███████╗ ╚████╔╝ ███████╗   ██║   █████╗  ██╔████╔██║             *
-				       *    ╚════██║  ╚██╔╝  ╚════██║   ██║   ██╔══╝  ██║╚██╔╝██║             *
-				       *    ███████║   ██║   ███████║   ██║   ███████╗██║ ╚═╝ ██║             *
-				       *    ╚══════╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝     ╚═╝             *
-				       *                                                                      *
-				       ************************************************************************
-				       *                                                                      *
-				       *   Document Management System                                         *
-				       *   전자봉투를 이용한 기업 문서 관리 시스템 프로토타입                             *
-				       *                                                                      *
-				       *                                                                      *
-				       ************************************************************************
-
-				""";
-		System.out.println(str);
 	}
 }
