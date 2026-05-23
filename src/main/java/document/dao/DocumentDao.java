@@ -14,7 +14,6 @@ public class DocumentDao {
 	private static final String C_TITLE = "title";
 	private static final String C_UPLOADER_ID = "uploader_id";
 	private static final String C_ENCRYPTED_CONTENT = "encrypted_content";
-	private static final String C_SECRET_KEY = "secret_key";
 	private static final String C_SIGNATURE = "encrypted_signature";
 	private static final String C_CREATED_AT = "created_at";
 	
@@ -24,7 +23,6 @@ public class DocumentDao {
 				.value(C_TITLE, doc.getTitle())
 				.value(C_UPLOADER_ID, doc.getUploaderId())
 				.value(C_ENCRYPTED_CONTENT, doc.getContentPath())
-				.value(C_SECRET_KEY, doc.getSecretKeyPath())
 				.value(C_SIGNATURE, doc.getSignature());
 		return QueryExecutor.executeInsert(conn, builder);
 	}

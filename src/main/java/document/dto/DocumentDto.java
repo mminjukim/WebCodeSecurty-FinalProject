@@ -7,16 +7,13 @@ public class DocumentDto {
 	private String title;
 	private int uploaderId;
 	private String contentPath;
-	private String secretKeyPath;
 	private byte[] encryptedSignature;
 	private LocalDateTime createdAt;
 
-	public DocumentDto(String title, int uploaderId, 
-			String contentPath, String secretKeyPath, byte[] signature) {
+	public DocumentDto(String title, int uploaderId, String contentPath, byte[] signature) {
 		this.title = title;
 		this.uploaderId = uploaderId;
 		this.contentPath = contentPath; 
-		this.secretKeyPath = secretKeyPath;
 		this.encryptedSignature = signature;
 	}
 
@@ -32,13 +29,7 @@ public class DocumentDto {
 		return contentPath;
 	}
 
-	public String getSecretKeyPath() {
-		return secretKeyPath;
-	}
-
 	public byte[] getSignature() {
 		return encryptedSignature;
 	}
-	
-	
 }

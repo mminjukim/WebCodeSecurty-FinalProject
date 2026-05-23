@@ -105,12 +105,6 @@ public class DocService {
 			keyGen.init(KEYSIZE);
 			SecretKey secretKey = keyGen.generateKey();
 
-			// 비밀키 저장
-			String secretKeyPath = KeyFileService.buildKeyPath(
-					KeyDomain.DOCUMENT, KeyType.SECRET, fileName
-			);
-			KeyFileService.write(secretKeyPath, secretKey);
-
 			// 문서를 비밀키로 암호화
 			String outputFilePath = buildPath(FileType.ENCRYPTED, fileName);
 			docEncryptService.encryptDocument(filePath, outputFilePath, secretKey);
@@ -134,7 +128,7 @@ public class DocService {
 			}
 			
 			// 문서 정보 저장
-			DocumentDto doc = new DocumentDto(fileName, userId, outputFilePath, secretKeyPath, encryptedSignature);
+			DocumentDto doc = new DocumentDto(fileName, userId, outputFilePath, encryptedSignature);
 			int insertedId = documentDao.insertDocument(conn, doc);
 			if (insertedId == 0) {
 				throw new IllegalStateException("문서 데이터베이스 삽입에 실패했습니다.");

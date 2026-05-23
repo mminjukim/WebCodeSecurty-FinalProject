@@ -18,7 +18,7 @@ public class KeyFileService {
 	private static final String KEY_EXTENSION = ".key";
 
 	public enum KeyDomain {
-		USER("user"), DOCUMENT("document"), ROLE("role");
+		USER("user"), ROLE("role");
 
 		private final String dirName;
 
@@ -32,7 +32,7 @@ public class KeyFileService {
 	}
 
 	public enum KeyType {
-		PUBLIC("public"), PRIVATE("private"), SECRET("secret");
+		PUBLIC("public"), PRIVATE("private");
 
 		private final String dirName;
 
@@ -50,7 +50,6 @@ public class KeyFileService {
 	 */
 	public static void makeKeyDirs() {
 		List<String> keyDirs = List.of(
-				".keys/document/secret", 
 				".keys/user/private", 
 				".keys/user/public", 
 				".keys/role/public",

@@ -43,7 +43,6 @@ public class DataInitializer {
 				    title VARCHAR(255) NOT NULL,
 				    uploader_id INT NOT NULL,
 				    encrypted_content VARCHAR(255),
-				    secret_key VARCHAR(255),
 				    encrypted_signature BLOB,
 				    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 				    FOREIGN KEY (uploader_id) REFERENCES users(id) ON DELETE CASCADE
