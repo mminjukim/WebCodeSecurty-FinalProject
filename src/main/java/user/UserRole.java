@@ -1,16 +1,24 @@
 package main.java.user;
 
+import java.util.ArrayList;
+
 public enum UserRole {
-	HR(1), FINANCE(2), SALES(3), LEGAL(4);
+	HR(1, "인사"), FINANCE(2, "재무"), SALES(3, "영업"), LEGAL(4, "법무");
 
 	private final int id;
+	private final String korName;
 
-	UserRole(int id) {
+	UserRole(int id, String korName) {
 		this.id = id;
+		this.korName = korName;
 	}
 
 	public int getId() {
 		return id;
+	}
+
+	public String getKorName() {
+		return korName;
 	}
 
 	public static UserRole fromId(int id) {
@@ -20,5 +28,13 @@ public enum UserRole {
 			}
 		}
 		throw new IllegalArgumentException("유효하지 않은 역할 번호입니다: " + id);
+	}
+
+	public static String getNumberAndKorName() {
+		ArrayList<String> list = new ArrayList<>();
+		for (UserRole role : values()) {
+			list.add(role.getId() + "-" + role.getKorName());
+		}
+		return String.join(", ", list);
 	}
 }

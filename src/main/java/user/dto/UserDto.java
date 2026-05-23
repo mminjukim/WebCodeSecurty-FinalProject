@@ -1,7 +1,7 @@
 package main.java.user.dto;
 
 public class UserDto {
-	private long id;
+	private int id;
 	private String username;
 	private String password;
 	private String publicKey;
@@ -14,14 +14,17 @@ public class UserDto {
 		this.roleId = roleId;
 	}
 
-	public UserDto(long id, String username, String password, 
-			String publicKey, String privateKey, int roleId) {
+	public UserDto(int id, String username, String password, String publicKey, String privateKey, int roleId) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.publicKey = publicKey;
 		this.privateKey = privateKey;
 		this.roleId = roleId;
+	}
+
+	public int getId() {
+		return id;
 	}
 
 	public String getUsername() {
