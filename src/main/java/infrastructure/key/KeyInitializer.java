@@ -57,7 +57,7 @@ public class KeyInitializer {
 						.value("public_key", publicKeyPath)
 						.value("private_key", privateKeyPath);
 				
-				QueryExecutor.executeUpdate(conn, query);
+				QueryExecutor.executeInsert(conn, query);
 			}
 
 		} catch (SQLException e) {

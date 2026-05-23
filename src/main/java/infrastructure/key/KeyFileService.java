@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,7 +50,7 @@ public class KeyFileService {
 	 */
 	public static void makeKeyDirs() {
 		List<String> keyDirs = List.of(
-				".keys/document", 
+				".keys/document/secret", 
 				".keys/user/private", 
 				".keys/user/public", 
 				".keys/role/public",
@@ -59,6 +60,8 @@ public class KeyFileService {
 			Path path = Paths.get(dirPath);
 			try {
 				Files.createDirectories(path);
+			} catch (FileAlreadyExistsException e) {
+				continue;
 			} catch (IOException e) {
 				System.out.println("[오류] 초기 키 디렉토리 구성에 실패했습니다:" + path);
 				System.exit(1);
@@ -90,8 +93,7 @@ public class KeyFileService {
 			Object obj = ois.readObject();
 			return (Key) obj;
 		} catch (ClassNotFoundException | IOException e) {
-			System.out.println("[오류] 사용자 키를 불러오는 중 오류가 발생했습니다.");
-			return null;
+			throw new RuntimeException("키를 불러오는 중 오류가 발생했습니다.");
 		}
 	}
 
@@ -106,9 +108,7 @@ public class KeyFileService {
 				ObjectOutputStream ostream = new ObjectOutputStream(fstream)) {
 			ostream.writeObject(key);	
 		} catch (IOException e) {
-			System.out.println("[오류] 사용자 키 저장 중 오류가 발생했습니다.");
-			System.out.println(e.getMessage());
-			e.printStackTrace();
+			throw new RuntimeException("키 저장 중 오류가 발생했습니다.");
 		}
 	}
 }
