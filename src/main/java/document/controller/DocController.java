@@ -1,5 +1,7 @@
 package main.java.document.controller;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -27,8 +29,16 @@ public class DocController {
 		try {
 			System.out.print("1. 업로드할 문서의 경로를 입력하세요: ");
 			String filePath = scanner.nextLine();
+
+			// 빈 문자열 체크
 			if (filePath == null || filePath.isEmpty()) {
 				throw new IllegalArgumentException("파일명을 입력해주세요.");
+			}
+
+			// 파일 존재 유무 우선적 확인
+			try (FileInputStream fis = new FileInputStream(filePath)) {
+			} catch (IOException e) {
+				throw new IllegalArgumentException("업로드할 문서를 찾을 수 없습니다.");
 			}
 
 			System.out.println("2. 열람 권한을 허용할 역할의 번호들을 입력하세요. [ " + UserRole.getNumberAndKorName() + " ]");
