@@ -27,7 +27,7 @@ public class UserDao {
 				.value(COL_PUBLIC_KEY, user.getPublicKey())
 				.value(COL_PRIVATE_KEY, user.getPrivateKey())
 				.value(COL_ROLE_ID, user.getRoleId());
-		return QueryExecutor.executeUpdate(conn, builder);
+		return QueryExecutor.executeInsert(conn, builder);
 	}
 
 	public UserDto getUserByUsername(Connection conn, String username) throws SQLException {
@@ -35,10 +35,10 @@ public class UserDao {
 				.select(COL_ID, COL_USERNAME, COL_PASSWORD_HASH, COL_ROLE_ID, COL_PUBLIC_KEY, COL_PRIVATE_KEY)
 				.from(TABLE_USERS)
 				.where(COL_USERNAME + " = ?", username);
-		return QueryExecutor.executeQuery(conn, builder, rs -> {
+		return QueryExecutor.executeSelect(conn, builder, rs -> {
 			if (rs.next()) {
 				return new UserDto(
-						rs.getLong(COL_ID),
+						rs.getInt(COL_ID),
 						rs.getString(COL_USERNAME),
 						rs.getString(COL_PASSWORD_HASH),
 						rs.getString(COL_PUBLIC_KEY),
@@ -55,6 +55,19 @@ public class UserDao {
 				.select("1")
 				.from(TABLE_USERS)
 				.where(COL_USERNAME + " = ?", username);
-		return QueryExecutor.executeQuery(conn, builder, ResultSet::next);
+		return QueryExecutor.executeSelect(conn, builder, ResultSet::next);
+	}
+	
+	public String getPrivateKeyPathById(Connection conn, int id) throws SQLException {
+		SqlQueryBuilder builder = new SqlQueryBuilder()
+				.select(COL_PRIVATE_KEY)
+				.from(TABLE_USERS)
+				.where(COL_ID + " = ?", id);
+		return QueryExecutor.executeSelect(conn, builder, rs -> {
+			if (rs.next()) {
+	            return rs.getString(COL_PRIVATE_KEY);
+	        }
+	        throw new IllegalArgumentException("해당 ID의 사용자 정보를 찾을 수 없습니다: " + id);
+		});
 	}
 }

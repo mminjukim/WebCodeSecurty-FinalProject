@@ -3,12 +3,15 @@ package main.java;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
+import main.java.document.controller.DocController;
 import main.java.infrastructure.lifecycle.AppConfig;
 import main.java.infrastructure.lifecycle.ServerLifeCycle;
 import main.java.user.controller.UserController;
 import main.java.user.dto.UserDto;
 
 public class DocSystem {
+
+	public static UserDto loggedInUser = null;
 
 	public static void main(String[] args) throws NoSuchAlgorithmException {
 
@@ -17,9 +20,8 @@ public class DocSystem {
 
 		AppConfig appConfig = new AppConfig();
 		UserController userController = appConfig.getUserController();
+		DocController docController = appConfig.getDocController();
 		Scanner scanner = appConfig.getScanner();
-
-		UserDto loggedInUser = null;
 
 		// 메뉴 입력
 		char choice = 'A';
@@ -33,7 +35,7 @@ public class DocSystem {
 				System.out.println("----------------------------------");
 				System.out.print(">> 메뉴를 선택하세요: ");
 
-				String input = scanner.next().trim();
+				String input = scanner.nextLine().trim();
 				if (input.isEmpty()) {
 					System.out.println("\n[알림] 메뉴를 입력해 주세요.\n");
 					continue;
@@ -66,7 +68,7 @@ public class DocSystem {
 				System.out.println("----------------------------------");
 				System.out.print(">> 메뉴를 선택하세요: ");
 
-				String input = scanner.next().trim();
+				String input = scanner.nextLine().trim();
 				if (input.isEmpty()) {
 					System.out.println("\n[알림] 메뉴를 입력해 주세요.\n");
 					continue;
@@ -75,7 +77,7 @@ public class DocSystem {
 
 				switch (choice) {
 				case 'U':
-					// TODO: 로직 추가
+					docController.uploadDocument();
 					break;
 				case 'R':
 					// TODO: 로직 추가
@@ -97,5 +99,6 @@ public class DocSystem {
 		}
 
 		scanner.close();
+		ServerLifeCycle.stop();
 	}
 }

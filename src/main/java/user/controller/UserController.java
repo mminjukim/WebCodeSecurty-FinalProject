@@ -3,6 +3,7 @@ package main.java.user.controller;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
+import main.java.user.UserRole;
 import main.java.user.UserService;
 import main.java.user.dto.SignupRequestDto;
 import main.java.user.dto.UserDto;
@@ -24,16 +25,16 @@ public class UserController {
 		System.out.println("\n--------------SignUp--------------");
 
 		System.out.print("1. 아이디를 입력하세요: ");
-		String username = scanner.next();
+		String username = scanner.nextLine();
 
-		System.out.print("2. 역할을 입력하세요 (숫자만 입력. 1-인사, 2-재무, 3-영업, 4-법무): ");
-		String roleInput = scanner.next();
+		System.out.print("2. 역할을 입력하세요 (숫자만 입력. " + UserRole.getNumberAndKorName() + "): ");
+		String roleInput = scanner.nextLine();
 
 		System.out.print("3. 비밀번호를 입력하세요: ");
-		String password = scanner.next();
+		String password = scanner.nextLine();
 
 		System.out.print("4. 비밀번호를 다시 입력하세요: ");
-		String confirmPassword = scanner.next();
+		String confirmPassword = scanner.nextLine();
 		System.out.println("----------------------------------\n");
 
 		try {
@@ -56,10 +57,10 @@ public class UserController {
 		System.out.println("\n--------------Login---------------");
 
 		System.out.print("아이디를 입력하세요: ");
-		String username = scanner.next();
+		String username = scanner.nextLine();
 
 		System.out.print("비밀번호를 입력하세요: ");
-		String password = scanner.next();
+		String password = scanner.nextLine();
 		System.out.println("----------------------------------\n");
 
 		if (username.trim().isEmpty() || password.trim().isEmpty()) {
