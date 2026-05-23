@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 public class QueryExecutor {
@@ -19,7 +20,7 @@ public class QueryExecutor {
 	}
 
 	// SELECT 실행
-	public static <T> T executeQuery(
+	public static <T> T executeSelect(
 			Connection conn, 
 			SqlQueryBuilder builder, 
 			ResultSetHandler<T> handler) 
@@ -32,9 +33,9 @@ public class QueryExecutor {
 		}
 	}
 
-	// INSERT, UPDATE 실행
-	public static int executeUpdate(Connection conn, SqlQueryBuilder builder) throws SQLException {
-		try (PreparedStatement pstmt = conn.prepareStatement(builder.getQuery())) {
+	// INSERT 실행
+	public static int executeInsert(Connection conn, SqlQueryBuilder builder) throws SQLException {
+		try (PreparedStatement pstmt = conn.prepareStatement(builder.getQuery(), Statement.RETURN_GENERATED_KEYS)) {
 			mapParameters(pstmt, builder.getParameters());
 			return pstmt.executeUpdate();
 		}

@@ -42,12 +42,19 @@ public class DataInitializer {
 				    id INT AUTO_INCREMENT PRIMARY KEY,
 				    title VARCHAR(255) NOT NULL,
 				    uploader_id INT NOT NULL,
-				    role_id INT NOT NULL,
-				    encrypted_content VARCHAR(255) NOT NULL,
-				    secret_key VARCHAR(255) NOT NULL,
-				    encrypted_signature BLOB NOT NULL,
+				    encrypted_content VARCHAR(255),
+				    secret_key VARCHAR(255),
+				    encrypted_signature BLOB,
 				    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-				    FOREIGN KEY (uploader_id) REFERENCES users(id) ON DELETE CASCADE,
+				    FOREIGN KEY (uploader_id) REFERENCES users(id) ON DELETE CASCADE
+				);
+				""";
+		String createWhitelists = """
+				CREATE TABLE IF NOT EXISTS whitelists (
+				    document_id INT NOT NULL,
+				    role_id INT NOT NULL,
+				    PRIMARY KEY (document_id, role_id),
+				    FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE,
 				    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
 				);
 				""";
@@ -55,6 +62,7 @@ public class DataInitializer {
 			stmt.executeUpdate(createRoles);
 			stmt.executeUpdate(createUsers);
 			stmt.executeUpdate(createDocuments);
+			stmt.executeUpdate(createWhitelists);
 		} catch (SQLException e) {
 			throw new IllegalStateException("데이터베이스 테이블 생성 중 오류가 발생했습니다.", e);
 		}
@@ -66,7 +74,7 @@ public class DataInitializer {
 	public static final void initializeRoles() {
 		SqlQueryBuilder query = new SqlQueryBuilder().select("count(*)").from("roles");
 		try (Connection conn = DBManager.getConnection()) {
-			boolean needsInitialization = QueryExecutor.executeQuery(conn, query, rs -> {
+			boolean needsInitialization = QueryExecutor.executeSelect(conn, query, rs -> {
 				if (rs.next()) {
 					return rs.getInt(1) == 0;
 				}
@@ -77,6 +85,20 @@ public class DataInitializer {
 			}
 		} catch (SQLException e) {
 			throw new IllegalStateException("역할 데이터 초기화 중 오류가 발생했습니다.", e);
+		}
+	}
+
+	/**
+	 * 테이블 전부 삭제
+	 */
+	public static final void dropAllTables() {
+		try (Connection conn = DBManager.getConnection(); Statement stmt = conn.createStatement()) {
+			stmt.executeUpdate("drop table if exists whitelists;");
+			stmt.executeUpdate("drop table if exists documents;");
+			stmt.executeUpdate("drop table if exists users;");
+			stmt.executeUpdate("drop table if exists roles;");
+		} catch (SQLException e) {
+			throw new IllegalStateException("데이터베이스 테이블 삭제에 실패했습니다.", e);
 		}
 	}
 
