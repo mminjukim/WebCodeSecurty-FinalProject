@@ -129,7 +129,7 @@ public class DocService {
 				envelopeService.createEnvelope(
 						publicKey, 
 						secretKey, 
-						buildPath(FileType.ENVELOPE, fileName)
+						buildPath(FileType.ENVELOPE, fileName + "_" + role.name())
 				);
 			}
 			
