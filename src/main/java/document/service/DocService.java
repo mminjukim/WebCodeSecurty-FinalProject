@@ -93,6 +93,7 @@ public class DocService {
 	 */
 	public int upload(String filePath, List<UserRole> whitelist) {
 		try (Connection conn = DBManager.getConnection()) {
+			
 			// 사용자 정보 조회 
 			int userId = DocSystem.loggedInUser.getId();
 			
@@ -135,6 +136,9 @@ public class DocService {
 			// 문서 정보 저장
 			DocumentDto doc = new DocumentDto(fileName, userId, outputFilePath, secretKeyPath, encryptedSignature);
 			int insertedId = documentDao.insertDocument(conn, doc);
+			if (insertedId == 0) {
+				throw new IllegalStateException("문서 데이터베이스 삽입에 실패했습니다.");
+			}
 			return insertedId;
 			
 		} catch (SQLException e) {

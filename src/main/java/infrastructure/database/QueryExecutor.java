@@ -37,8 +37,16 @@ public class QueryExecutor {
 	public static int executeInsert(Connection conn, SqlQueryBuilder builder) throws SQLException {
 		try (PreparedStatement pstmt = conn.prepareStatement(builder.getQuery(), Statement.RETURN_GENERATED_KEYS)) {
 			mapParameters(pstmt, builder.getParameters());
-			return pstmt.executeUpdate();
+			int insertedRow = pstmt.executeUpdate();
+			if (insertedRow > 0) {
+				try (ResultSet rs = pstmt.getGeneratedKeys()) {
+					if (rs.next()) {
+						return rs.getInt(1);
+					}
+				}
+			}
 		}
+		return 0;
 	}
 
 	// executeQuery 결과 ResultSet 처리용
