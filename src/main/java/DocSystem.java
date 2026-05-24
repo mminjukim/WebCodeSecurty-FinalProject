@@ -80,7 +80,7 @@ public class DocSystem {
 					docController.uploadDocument();
 					break;
 				case 'R':
-					// TODO: 로직 추가
+					docController.readDocument();
 					break;
 				case 'H':
 					// TODO: 로직 추가
