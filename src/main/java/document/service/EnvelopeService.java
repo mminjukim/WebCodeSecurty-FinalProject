@@ -1,7 +1,10 @@
 package main.java.document.service;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 
 import javax.crypto.Cipher;
@@ -31,4 +34,23 @@ public class EnvelopeService {
 		}
 	}
 
+	public SecretKey openEnvelope(PrivateKey privateKey, String keyAlgorithm, String inputPath) {
+		try {
+			// 전자봉투 가져오기
+			byte[] encryptedKeyBytes = new byte[0];
+			try (FileInputStream fis = new FileInputStream(inputPath);
+					BufferedInputStream bis = new BufferedInputStream(fis)) {
+				encryptedKeyBytes = bis.readAllBytes();
+			}
+
+			// Cipher 객체 초기화
+			Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+			cipher.init(Cipher.UNWRAP_MODE, privateKey);
+
+			// SecretKey 복호화 후 반환
+			return (SecretKey)cipher.unwrap(encryptedKeyBytes, keyAlgorithm, Cipher.SECRET_KEY);
+		} catch (Exception e) {
+			throw new IllegalStateException("문서의 전자봉투 개봉 중 오류가 발생했습니다.");
+		}
+	}
 }
