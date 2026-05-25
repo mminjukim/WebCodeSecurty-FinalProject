@@ -90,7 +90,7 @@ public class DocSystem {
 					loggedInUser = null;
 					break;
 				case 'Q':
-					System.out.println("프로그램을 종료합니다.");
+					System.out.println("\n[알림] 프로그램을 종료합니다.\n");
 					break;
 				default:
 					System.out.println("\n[알림] 올바른 메뉴를 입력해 주세요.\n");
