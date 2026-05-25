@@ -71,7 +71,7 @@ public class DocController {
 			System.out.println("[알림] 전체 문서 목록을 조회합니다...");
 
 			List<DocumentSummaryDto> documents = docService.getDocumentList();
-			System.out.println("\n[문서 목록]");
+			System.out.println("\n::: 문서 목록 :::");
 			for (DocumentSummaryDto doc : documents) {
 				System.out.println("[" + doc.getId() + "] " + doc.getTitle());
 			}
@@ -86,19 +86,16 @@ public class DocController {
 					.map(DocumentSummaryDto::getId)
 					.toList();
 			if (!ids.contains(docId)) {
-				throw new IllegalArgumentException("[오류] 해당 번호의 문서가 존재하지 않습니다.");
+				throw new IllegalArgumentException("해당 번호의 문서가 존재하지 않습니다.");
 			}
 
 			System.out.println("[알림] 문서 복호화를 시작합니다...");
 			String documentContent = docService.read(docId);
 
 			System.out.println("[알림] 문서가 성공적으로 복호화 되었습니다.");
-			System.out.println("----------[문서 본문 내용]-----------");
-			System.out.println("==================================");
+			System.out.println("\n=============CONTENT==============\n");
 			System.out.println(documentContent);
-			System.out.println("==================================");
-
-			System.out.println("----------------------------------\n");
+			System.out.println("\n==================================\n");
 
 		} catch (NumberFormatException e) {
 			System.out.println("[오류] 열람할 문서의 번호를 입력해야 합니다.");

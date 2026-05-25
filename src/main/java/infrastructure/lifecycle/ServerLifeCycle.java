@@ -58,8 +58,6 @@ public class ServerLifeCycle {
 				*                                                                      *
 				*                                                                      *
 				************************************************************************
-
-
 				""";
 		System.out.println(str);
 	}
