@@ -5,6 +5,7 @@ import java.util.Scanner;
 import main.java.document.controller.DocController;
 import main.java.document.dao.DocumentDao;
 import main.java.document.dao.WhitelistDao;
+import main.java.document.service.DocDecryptService;
 import main.java.document.service.DocEncryptService;
 import main.java.document.service.DocService;
 import main.java.document.service.DocSignatureService;
@@ -26,6 +27,7 @@ public class AppConfig {
 	private final UserService userService;
 	private final DocService docService;
 	private final DocEncryptService docEncryptService;
+	private final DocDecryptService docDecryptService;
 	private final DocSignatureService docSignatureService;
 	private final EnvelopeService envelopeService;
 
@@ -44,10 +46,11 @@ public class AppConfig {
 		// 비즈니스 로직 Service 생성
 		this.userService = new UserService(this.userDao);
 		this.docEncryptService = new DocEncryptService();
+		this.docDecryptService = new DocDecryptService();
 		this.docSignatureService = new DocSignatureService();
 		this.envelopeService = new EnvelopeService();
 		this.docService = new DocService(this.documentDao, this.userDao, this.whitelistDao, 
-				this.docEncryptService, this.docSignatureService, this.envelopeService);
+				this.docEncryptService, this.docDecryptService, this.docSignatureService, this.envelopeService);
 
 		// Controller 생성
 		this.userController = new UserController(this.scanner, this.userService);

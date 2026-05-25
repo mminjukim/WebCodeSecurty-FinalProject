@@ -58,6 +58,19 @@ public class UserDao {
 		return QueryExecutor.executeSelect(conn, builder, ResultSet::next);
 	}
 	
+	public String getPublicKeyPathById(Connection conn, int id) throws SQLException {
+		SqlQueryBuilder builder = new SqlQueryBuilder()
+				.select(COL_PUBLIC_KEY)
+				.from(TABLE_USERS)
+				.where(COL_ID + " = ?", id);
+		return QueryExecutor.executeSelect(conn, builder, rs -> {
+			if (rs.next()) {
+	            return rs.getString(COL_PUBLIC_KEY);
+	        }
+	        throw new IllegalArgumentException("해당 ID의 사용자 정보를 찾을 수 없습니다: " + id);
+		});
+	}
+	
 	public String getPrivateKeyPathById(Connection conn, int id) throws SQLException {
 		SqlQueryBuilder builder = new SqlQueryBuilder()
 				.select(COL_PRIVATE_KEY)
@@ -70,4 +83,5 @@ public class UserDao {
 	        throw new IllegalArgumentException("해당 ID의 사용자 정보를 찾을 수 없습니다: " + id);
 		});
 	}
+	
 }

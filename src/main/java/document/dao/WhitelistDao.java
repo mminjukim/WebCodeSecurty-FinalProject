@@ -19,4 +19,14 @@ public class WhitelistDao {
 				.value(C_ROLE_ID, roleId);
 		return QueryExecutor.executeInsert(conn, builder);
 	}
+	
+	public boolean existsByDocumentIdAndRoleId(Connection conn, int docId, int roleId) throws SQLException {
+		SqlQueryBuilder builder = new SqlQueryBuilder()
+  				.select("1")
+  				.from(T_WHITELIST)
+  				.where(C_DOCUMENT_ID + " = ?", docId)
+  				.where(C_ROLE_ID + " = ?", roleId);
+			
+	    return QueryExecutor.executeSelect(conn, builder, rs -> rs.next());
+	}
 }
