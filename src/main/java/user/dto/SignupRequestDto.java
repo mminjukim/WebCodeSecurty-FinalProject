@@ -1,18 +1,20 @@
 package main.java.user.dto;
 
+import java.util.Arrays;
+
 public class SignupRequestDto {
 	private final String username;
-	private final String password;
+	private final char[] password;
 	private final int roleId;
 
-	public SignupRequestDto(String username, String password, String confirmPassword, int roleId) {
+	public SignupRequestDto(String username, char[] password, char[] confirmPassword, int roleId) {
 		if (username == null || username.trim().isEmpty()) {
 			throw new IllegalArgumentException("아이디는 필수 입력값입니다.");
 		}
-		if (password == null || password.trim().isEmpty()) {
+		if (password == null || password.length == 0) {
 			throw new IllegalArgumentException("비밀번호는 필수 입력값입니다.");
 		}
-		if (!password.equals(confirmPassword)) {
+		if (Arrays.equals(password, confirmPassword) == false) {
 			throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
 		}
 
@@ -25,7 +27,7 @@ public class SignupRequestDto {
 		return username;
 	}
 
-	public String getPassword() {
+	public char[] getPassword() {
 		return password;
 	}
 
