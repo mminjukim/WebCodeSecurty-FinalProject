@@ -1,5 +1,6 @@
 package main.java.infrastructure.lifecycle;
 
+import java.io.Console;
 import java.util.Scanner;
 
 import main.java.document.controller.DocController;
@@ -20,6 +21,7 @@ import main.java.user.dao.UserDao;
 public class AppConfig {
 
 	private final Scanner scanner;
+	private final Console console;
 
 	// DAO
 	private final UserDao userDao;
@@ -43,6 +45,7 @@ public class AppConfig {
 
 	public AppConfig() {
 		this.scanner = new Scanner(System.in);
+		this.console = System.console();
 
 		// DAO 생성
 		this.userDao = new UserDao();
@@ -61,7 +64,7 @@ public class AppConfig {
 		this.readLogService = new ReadLogService(this.readLogDao, this.documentDao, this.userDao);
 		
 		// Controller 생성
-		this.userController = new UserController(this.scanner, this.userService);
+		this.userController = new UserController(this.scanner, this.console, this.userService);
 		this.docController = new DocController(this.scanner, this.docService);
 		this.readLogController = new ReadLogController(this.scanner, this.readLogService, this.docService);
 	}

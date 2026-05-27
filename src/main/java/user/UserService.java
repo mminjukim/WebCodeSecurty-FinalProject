@@ -42,14 +42,14 @@ public class UserService {
 				throw new IllegalStateException("회원가입 데이터베이스 삽입에 실패했습니다.");
 			}
 		} catch (SQLException e) {
-			throw new IllegalStateException("데이터베이스 연결 오류가 발생했습니다.", e);
+			throw new IllegalStateException("데이터베이스 연결 오류가 발생했습니다.");
 		}
 	}
 
 	/**
 	 * 로그인
 	 */
-	public UserDto login(String username, String password) throws NoSuchAlgorithmException {
+	public UserDto login(String username, char[] password) throws NoSuchAlgorithmException {
 		try (Connection conn = DBManager.getConnection()) {
 			UserDto user = userDao.getUserByUsername(conn, username);
 
@@ -57,15 +57,14 @@ public class UserService {
 				throw new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다.");
 			}
 
-			String hashedPassword = PasswordHasher.hash(password);
-			if (!user.getPassword().equals(hashedPassword)) {
+			if (PasswordHasher.verify(password, user.getPassword()) == false) {
 				throw new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다.");
 			}
 
 			return user;
 
 		} catch (SQLException e) {
-			throw new IllegalStateException("데이터베이스 연결 오류가 발생했습니다.", e);
+			throw new IllegalStateException("데이터베이스 연결 오류가 발생했습니다.");
 		}
 	}
 
