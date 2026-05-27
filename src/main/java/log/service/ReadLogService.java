@@ -173,7 +173,7 @@ public class ReadLogService {
 			String expectedPrevHash = INITIAL_PREV_HASH;
 
 			for (ReadLogDto log : logs) {
-				String errorMessage = "[원인] " + log.getId() + "번째 LOG: " + getLogLine(conn, log) + "\n";
+				String errorMessage = "[원인] " + "LOG: " + getLogLine(conn, log) + "\n";
 				
 				// prevHash 검증
 				if (!log.getPrevHash().equals(expectedPrevHash)) {
@@ -197,13 +197,13 @@ public class ReadLogService {
 
 				boolean signatureValid = verify(signData, log.getSignature(), publicKey);
 				if (signatureValid == false) {
-					throw new IllegalStateException(errorMessage + " 로그 전자서명 검증을 실패했습니다.");
+					throw new IllegalStateException(errorMessage + "로그 전자서명 검증에 실패했습니다.");
 				}
 
 				// current hash 검증
 				String expectedCurrentHash = hash(signData + Base64.getEncoder().encodeToString(log.getSignature()));
 				if (!expectedCurrentHash.equals(log.getCurrentHash())) {
-					throw new IllegalStateException(errorMessage + " 로그 무결성 검증을 실패했습니다.");
+					throw new IllegalStateException(errorMessage + "로그 무결성 검증을 실패했습니다.");
 				}
 
 				// 다음 체이닝 검증용
@@ -291,8 +291,8 @@ public class ReadLogService {
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append(log.getReadAt())
-		  .append(" READ[").append(log.getId()).append("]")
-		  .append(": user=").append(username)
+		  .append(" READ: ")
+		  .append("user=").append(username)
 		  .append(", role=").append(log.getReaderRole())
 		  .append(", status=").append(log.getStatus())
 		  .append(", fail=").append(log.getFailReason());
