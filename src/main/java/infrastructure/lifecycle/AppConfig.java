@@ -59,9 +59,9 @@ public class AppConfig {
 		this.docDecryptService = new DocDecryptService();
 		this.docSignatureService = new DocSignatureService();
 		this.envelopeService = new EnvelopeService();
-		this.docService = new DocService(this.documentDao, this.userDao, this.whitelistDao, 
-				this.docEncryptService, this.docDecryptService, this.docSignatureService, this.envelopeService);
 		this.readLogService = new ReadLogService(this.readLogDao, this.documentDao, this.userDao);
+		this.docService = new DocService(this.documentDao, this.userDao, this.whitelistDao, 
+				this.docEncryptService, this.docDecryptService, this.docSignatureService, this.envelopeService, this.readLogService);
 		
 		// Controller 생성
 		this.userController = new UserController(this.scanner, this.console, this.userService);
