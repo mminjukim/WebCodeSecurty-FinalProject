@@ -24,6 +24,8 @@ import main.java.infrastructure.database.DBManager;
 import main.java.infrastructure.key.KeyFileService;
 import main.java.infrastructure.key.KeyFileService.KeyDomain;
 import main.java.infrastructure.key.KeyFileService.KeyType;
+import main.java.log.service.ReadLogService;
+import main.java.log.service.ReadLogService.FailReason;
 import main.java.user.UserRole;
 import main.java.user.dao.UserDao;
 
@@ -40,11 +42,11 @@ public class DocService {
 	private final DocDecryptService docDecryptService;
 	private final DocSignatureService docSignatureService;
 	private final EnvelopeService envelopeService;
-
+	private final ReadLogService readLogService; 
 
 	public DocService(DocumentDao documentDao, UserDao userDao, WhitelistDao whitelistDao,
 			DocEncryptService docEncryptService, DocDecryptService docDecryptService, DocSignatureService docSignatureService,
-			EnvelopeService envelopeService) {
+			EnvelopeService envelopeService, ReadLogService readLogService) {
 		this.documentDao = documentDao;
 		this.userDao = userDao;
 		this.whitelistDao = whitelistDao;
@@ -52,6 +54,7 @@ public class DocService {
 		this.docDecryptService = docDecryptService;
 		this.docSignatureService = docSignatureService;
 		this.envelopeService = envelopeService;
+		this.readLogService = readLogService;
 	}
 
 
@@ -216,14 +219,22 @@ public class DocService {
 			//문서 가져오기
 			doc = documentDao.getDocumentById(conn, docId);
 			if (doc == null) {
-				throw new IllegalArgumentException("해당하는 문서가 존재하지 않습니다.");
+				throw new IllegalStateException("해당하는 문서가 존재하지 않습니다.");
 			}
 
 			// 사용자 공개 키 가져오기
 			uploaderPublicKeyPath = userDao.getPublicKeyPathById(conn, doc.getUploaderId());
-		} catch (SQLException e) {
+		} catch (IllegalArgumentException e) {	// 권한 없음
+			readLogService.recordFailLog(docId, FailReason.NO_PERMISSION);
+			throw new IllegalStateException(e.getMessage());
+		} catch (IllegalStateException e) {		// 존재하지 않는 문서
+			readLogService.recordFailLog(docId, FailReason.DOC_NOT_FOUND);
+			throw new IllegalStateException(e.getMessage());
+		} catch (SQLException e) { 		//DB, 시스템 오류
+			readLogService.recordFailLog(docId, FailReason.ERROR);
 			throw new IllegalStateException("문서 정보 조회 중 오류가 발생했습니다.");
-		} catch (Exception e) {
+		} catch (Exception e) {			//DB, 시스템 오류
+			readLogService.recordFailLog(docId, FailReason.ERROR);
 			throw new IllegalStateException(e.getMessage() + "\n[알림] 문서 열람을 중단합니다.");
 		}
 
@@ -254,9 +265,15 @@ public class DocService {
 				throw new IllegalStateException("문서 검증을 실패했습니다.");
 			}
 
+			//로그 저장
+			readLogService.recordSuccessLog(docId);
 			// 복호화된 문서 내용 반환
 			return decryptedContent;
-		} catch (Exception e) {
+		} catch (IllegalStateException e) {	// 전자서명 검증 실패
+			readLogService.recordFailLog(docId, FailReason.SIGNATURE_INVALID);
+			throw new IllegalStateException(e.getMessage() + "\n[알림] 문서 복호화 및 검증을 중단합니다.");
+		} catch (Exception e) { 		// 복호화 실패
+			readLogService.recordFailLog(docId, FailReason.DECRYPT_FAIL);
 			throw new IllegalStateException(e.getMessage() + "\n[알림] 문서 복호화 및 검증을 중단합니다.");
 		}
 

@@ -64,4 +64,17 @@ public class DocumentDao {
 		});
 	}
 	
+	public int getUploaderIdById(Connection conn, int id) throws SQLException {
+		SqlQueryBuilder builder = new SqlQueryBuilder()
+				.select(C_UPLOADER_ID)
+				.from(T_DOCUMENT)
+				.where(C_ID + " = ?", id);
+		return QueryExecutor.executeSelect(conn, builder, rs -> {
+			if (rs.next()) {
+				return rs.getInt(C_UPLOADER_ID);
+			}
+			return null;
+		});
+	}
+	
 }

@@ -84,4 +84,16 @@ public class UserDao {
 		});
 	}
 	
+	public String getUsernameById(Connection conn, int id) throws SQLException {
+		SqlQueryBuilder builder = new SqlQueryBuilder()
+				.select(COL_USERNAME)
+				.from(TABLE_USERS)
+				.where(COL_ID + " = ?", id);
+		return QueryExecutor.executeSelect(conn, builder, rs -> {
+			if (rs.next()) {
+	            return rs.getString(COL_USERNAME);
+	        }
+	        throw new IllegalArgumentException("해당 ID의 사용자 정보를 찾을 수 없습니다: " + id);
+		});
+	}
 }
