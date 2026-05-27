@@ -1,5 +1,6 @@
 package main.java.user.controller;
 
+import java.io.Console;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
@@ -12,9 +13,11 @@ public class UserController {
 
 	private final UserService userService;
 	private final Scanner scanner;
+	private final Console console;
 
-	public UserController(Scanner scanner, UserService userService) {
+	public UserController(Scanner scanner, Console console, UserService userService) {
 		this.scanner = scanner;
+		this.console = console;
 		this.userService = userService;
 	}
 
@@ -22,6 +25,11 @@ public class UserController {
 	 * 회원가입 화면 출력 및 사용자 입력 처리
 	 */
 	public void processSignup() {
+		if (console == null) {
+			System.out.println("\n[오류] 콘솔이 지원되지 않는 환경입니다.");
+			return;
+		}
+
 		System.out.println("\n--------------SignUp--------------");
 
 		System.out.print("1. 아이디를 입력하세요: ");
@@ -30,11 +38,9 @@ public class UserController {
 		System.out.print("2. 역할을 입력하세요 (숫자만 입력. " + UserRole.getNumberAndKorName() + "): ");
 		String roleInput = scanner.nextLine();
 
-		System.out.print("3. 비밀번호를 입력하세요: ");
-		String password = scanner.nextLine();
+		char[] password = console.readPassword("3. 비밀번호를 입력하세요: ");
+		char[] confirmPassword = console.readPassword("4. 비밀번호를 다시 입력하세요: ");
 
-		System.out.print("4. 비밀번호를 다시 입력하세요: ");
-		String confirmPassword = scanner.nextLine();
 		System.out.println("----------------------------------\n");
 
 		try {
@@ -54,16 +60,19 @@ public class UserController {
 	 * 로그인 화면 출력 및 사용자 입력 처리
 	 */
 	public UserDto processLogin() {
+		if (console == null) {
+			System.out.println("\n[오류] 콘솔이 지원되지 않는 환경입니다.");
+			return null;
+		}
+
 		System.out.println("\n--------------Login---------------");
 
 		System.out.print("아이디를 입력하세요: ");
 		String username = scanner.nextLine();
-
-		System.out.print("비밀번호를 입력하세요: ");
-		String password = scanner.nextLine();
+		char[] password = console.readPassword("비밀번호를 입력하세요: ");
 		System.out.println("----------------------------------\n");
 
-		if (username.trim().isEmpty() || password.trim().isEmpty()) {
+		if ((username == null || username.trim().isEmpty()) || (password == null || password.length == 0)) {
 			System.out.println("[오류] 아이디와 비밀번호는 필수로 입력해야 합니다.");
 			return null;
 		}
