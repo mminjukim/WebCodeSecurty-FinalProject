@@ -6,6 +6,7 @@ import java.util.Scanner;
 import main.java.document.controller.DocController;
 import main.java.infrastructure.lifecycle.AppConfig;
 import main.java.infrastructure.lifecycle.ServerLifeCycle;
+import main.java.log.controller.ReadLogController;
 import main.java.user.controller.UserController;
 import main.java.user.dto.UserDto;
 
@@ -21,6 +22,7 @@ public class DocSystem {
 		AppConfig appConfig = new AppConfig();
 		UserController userController = appConfig.getUserController();
 		DocController docController = appConfig.getDocController();
+		ReadLogController readLogController = appConfig.getReadLogController();
 		Scanner scanner = appConfig.getScanner();
 
 		// 메뉴 입력
@@ -83,7 +85,7 @@ public class DocSystem {
 					docController.readDocument();
 					break;
 				case 'H':
-					// TODO: 로직 추가
+					readLogController.viewLogs();
 					break;
 				case 'L':
 					System.out.println("\n[알림] 로그아웃 되었습니다.\n");

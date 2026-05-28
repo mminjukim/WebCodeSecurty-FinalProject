@@ -23,6 +23,10 @@ public class SqlQueryBuilder {
 	private List<Object> insertParameters = new ArrayList<>();
 	private List<Object> setParameters = new ArrayList<>();
 	private List<Object> whereParameters = new ArrayList<>();
+	
+	// 정렬 및 제한 필드 추가
+	private String orderByClause = "";
+	private Integer limitValue = null;
 
 	/**
 	 * select 할 필드 지정
@@ -110,6 +114,24 @@ public class SqlQueryBuilder {
 		Collections.addAll(this.whereParameters, params);
 		return this;
 	}
+	
+	/**
+	 * orderBy 조건 지정
+	 * * @param orderBy 정렬할 컬럼과 방식 (e.g. "id DESC")
+	 */
+	public SqlQueryBuilder orderBy(String orderBy) {
+		this.orderByClause = orderBy;
+		return this;
+	}
+	
+	/**
+	 * 조회할 최대 레코드 개수 지정
+	 * * @param limit 가져올 행의 개수
+	 */
+	public SqlQueryBuilder limit(int limit) {
+		this.limitValue = limit;
+		return this;
+	}
 
 	// 쿼리 합치기
 	public String getQuery() {
@@ -127,6 +149,12 @@ public class SqlQueryBuilder {
 		String query = "SELECT " + String.join(", ", selectColumns) + " FROM " + table;
 		if (whereConditions.isEmpty() == false) {
 			query += " WHERE " + String.join(" AND ", whereConditions);
+		}
+		if (orderByClause.isEmpty() == false) {
+			query += " ORDER BY " + orderByClause;
+		}
+		if (limitValue != null) {
+			query += " LIMIT " + limitValue;
 		}
 		return query;
 	}

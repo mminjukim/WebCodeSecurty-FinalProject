@@ -57,11 +57,26 @@ public class DataInitializer {
 				    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
 				);
 				""";
+		String createReadLogs = """
+		        CREATE TABLE IF NOT EXISTS read_logs (
+		            id INT AUTO_INCREMENT PRIMARY KEY,
+		            doc_id INT NOT NULL,  
+		            reader_id INT NOT NULL, 
+		            reader_role VARCHAR(50) NOT NULL,
+		            status VARCHAR(20) NOT NULL,
+		            fail_reason VARCHAR(50),
+		            signature BLOB NOT NULL,
+		            prev_hash VARCHAR(64) NOT NULL,
+		            current_hash VARCHAR(64) NOT NULL,
+		            read_at VARCHAR(30) NOT NULL		            
+		        );
+		        """;
 		try (Connection conn = DBManager.getConnection(); Statement stmt = conn.createStatement()) {
 			stmt.executeUpdate(createRoles);
 			stmt.executeUpdate(createUsers);
 			stmt.executeUpdate(createDocuments);
 			stmt.executeUpdate(createWhitelists);
+			stmt.executeUpdate(createReadLogs);
 		} catch (SQLException e) {
 			throw new IllegalStateException("데이터베이스 테이블 생성 중 오류가 발생했습니다.", e);
 		}
