@@ -29,6 +29,9 @@ public class ReadLogController {
 			//전체 문서 목록 출력
 			System.out.println("[알림] 전체 문서 목록을 출력합니다...");
 			List<DocumentSummaryDto> documents = docService.getDocumentList();
+			if (documents.isEmpty()) {
+		        throw new IllegalStateException("등록된 문서가 없습니다.");
+			}
 			System.out.println("\n::: 문서 목록 :::");
 			for (DocumentSummaryDto doc : documents) {
 				System.out.println("[" + doc.getId() + "] " + doc.getTitle());

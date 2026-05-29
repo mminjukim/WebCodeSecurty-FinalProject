@@ -71,10 +71,14 @@ public class DocController {
 			System.out.println("[알림] 전체 문서 목록을 조회합니다...");
 
 			List<DocumentSummaryDto> documents = docService.getDocumentList();
+			if (documents.isEmpty()) {
+		        throw new IllegalStateException("등록된 문서가 없습니다.");
+			}
 			System.out.println("\n::: 문서 목록 :::");
 			for (DocumentSummaryDto doc : documents) {
 				System.out.println("[" + doc.getId() + "] " + doc.getTitle());
 			}
+			
 
 			System.out.print("\n열람할 문서의 번호를 입력하세요: ");
 			String docInput = scanner.nextLine();
