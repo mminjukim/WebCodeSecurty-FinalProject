@@ -49,6 +49,14 @@ public class QueryExecutor {
 		return 0;
 	}
 
+	// UPDATE, DELETE 등 실행
+	public static int executeUpdate(Connection conn, SqlQueryBuilder builder) throws SQLException {
+		try (PreparedStatement pstmt = conn.prepareStatement(builder.getQuery())) {
+			mapParameters(pstmt, builder.getParameters());
+			return pstmt.executeUpdate();
+		}
+	}
+
 	// executeQuery 결과 ResultSet 처리용
 	@FunctionalInterface
 	public interface ResultSetHandler<T> {

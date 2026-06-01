@@ -107,6 +107,7 @@ public class DataInitializer {
 	 */
 	public static final void dropAllTables() {
 		try (Connection conn = DBManager.getConnection(); Statement stmt = conn.createStatement()) {
+			stmt.executeUpdate("drop table if exists read_logs;");
 			stmt.executeUpdate("drop table if exists whitelists;");
 			stmt.executeUpdate("drop table if exists documents;");
 			stmt.executeUpdate("drop table if exists users;");
@@ -115,5 +116,4 @@ public class DataInitializer {
 			throw new IllegalStateException("데이터베이스 테이블 삭제에 실패했습니다.", e);
 		}
 	}
-
 }

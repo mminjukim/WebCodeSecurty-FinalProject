@@ -14,9 +14,10 @@ import main.java.document.service.EnvelopeService;
 import main.java.log.controller.ReadLogController;
 import main.java.log.dao.ReadLogDao;
 import main.java.log.service.ReadLogService;
-import main.java.user.UserService;
 import main.java.user.controller.UserController;
+import main.java.user.dao.RoleDao;
 import main.java.user.dao.UserDao;
+import main.java.user.service.UserService;
 
 public class AppConfig {
 
@@ -25,9 +26,10 @@ public class AppConfig {
 
 	// DAO
 	private final UserDao userDao;
+	private final RoleDao roleDao;
 	private final DocumentDao documentDao;
-	private WhitelistDao whitelistDao;
-	private ReadLogDao readLogDao;
+	private final WhitelistDao whitelistDao;
+	private final ReadLogDao readLogDao;
 	
 	// Service
 	private final UserService userService;
@@ -49,19 +51,21 @@ public class AppConfig {
 
 		// DAO 생성
 		this.userDao = new UserDao();
+		this.roleDao = new RoleDao();
 		this.documentDao = new DocumentDao();
 		this.whitelistDao = new WhitelistDao();
 		this.readLogDao = new ReadLogDao();
 		
 		// 비즈니스 로직 Service 생성
-		this.userService = new UserService(this.userDao);
+		this.userService = new UserService(this.userDao, this.roleDao);
 		this.docEncryptService = new DocEncryptService();
 		this.docDecryptService = new DocDecryptService();
 		this.docSignatureService = new DocSignatureService();
 		this.envelopeService = new EnvelopeService();
-		this.readLogService = new ReadLogService(this.readLogDao, this.documentDao, this.userDao);
-		this.docService = new DocService(this.documentDao, this.userDao, this.whitelistDao, 
-				this.docEncryptService, this.docDecryptService, this.docSignatureService, this.envelopeService, this.readLogService);
+		this.readLogService = new ReadLogService(this.readLogDao, this.documentDao, this.userDao, this.userService);
+		this.docService = new DocService(this.documentDao, this.userDao, this.roleDao, this.whitelistDao,
+										 this.docEncryptService, this.docDecryptService, this.docSignatureService, 
+										 this.envelopeService, this.readLogService);
 		
 		// Controller 생성
 		this.userController = new UserController(this.scanner, this.console, this.userService);
@@ -80,12 +84,16 @@ public class AppConfig {
 	public DocController getDocController() {
 		return docController;
 	}
-
-	public DocService getDocService() {
-		return docService;
-	}
 	
 	public ReadLogController getReadLogController() {
 		return readLogController;
+	}
+
+	public RoleDao getRoleDao() {
+		return roleDao;
+	}
+
+	public UserService getUserService() {
+		return userService;
 	}
 }

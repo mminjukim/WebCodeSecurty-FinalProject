@@ -27,6 +27,7 @@ import main.java.infrastructure.key.KeyFileService.KeyType;
 import main.java.log.service.ReadLogService;
 import main.java.log.service.ReadLogService.FailReason;
 import main.java.user.UserRole;
+import main.java.user.dao.RoleDao;
 import main.java.user.dao.UserDao;
 
 public class DocService {
@@ -37,19 +38,24 @@ public class DocService {
 
 	private final DocumentDao documentDao;
 	private final UserDao userDao;
+	private final RoleDao roleDao;
 	private final WhitelistDao whitelistDao;
+
 	private final DocEncryptService docEncryptService;
 	private final DocDecryptService docDecryptService;
 	private final DocSignatureService docSignatureService;
 	private final EnvelopeService envelopeService;
 	private final ReadLogService readLogService; 
 
-	public DocService(DocumentDao documentDao, UserDao userDao, WhitelistDao whitelistDao,
+	public DocService(DocumentDao documentDao, UserDao userDao, RoleDao roleDao, WhitelistDao whitelistDao,
 			DocEncryptService docEncryptService, DocDecryptService docDecryptService, DocSignatureService docSignatureService,
 			EnvelopeService envelopeService, ReadLogService readLogService) {
+
 		this.documentDao = documentDao;
 		this.userDao = userDao;
+		this.roleDao = roleDao;
 		this.whitelistDao = whitelistDao;
+
 		this.docEncryptService = docEncryptService;
 		this.docDecryptService = docDecryptService;
 		this.docSignatureService = docSignatureService;
@@ -125,12 +131,12 @@ public class DocService {
 			for (UserRole role : whitelist) {
 				PublicKey publicKey = (PublicKey) KeyFileService.read(
 						KeyFileService.buildKeyPath(KeyDomain.ROLE, KeyType.PUBLIC, role.name())
-						);
+				);
 				envelopeService.createEnvelope(
 						publicKey, 
 						secretKey, 
 						buildPath(FileType.ENVELOPE, fileName + "_" + role.name())
-						);
+				);
 			}
 
 			// 문서 정보 저장
@@ -158,7 +164,7 @@ public class DocService {
 	public void saveWhitelist(int docId, List<UserRole> whitelist) {
 		try (Connection conn = DBManager.getConnection()) {
 			for (UserRole role : whitelist) {
-				whitelistDao.insertWhitelist(conn, docId, role.getId());
+				whitelistDao.insertWhitelist(conn, docId, roleDao.getRoleId(conn, role));
 			}
 		} catch (SQLException e) {
 			throw new IllegalStateException("문서 열람 권한 정보 저장 중 오류가 발생했습니다.");
@@ -208,6 +214,7 @@ public class DocService {
 
 		// 사용자 역할 정보 조회 
 		int roleId = DocSystem.loggedInUser.getRoleId();
+		UserRole role = null;
 
 		DocumentDto doc;
 		String uploaderPublicKeyPath;
@@ -215,6 +222,7 @@ public class DocService {
 		try (Connection conn = DBManager.getConnection()) {
 			//역할 권한 검증
 			validatePermission(conn, docId, roleId);
+			role = UserRole.valueOf(roleDao.getNameById(conn, roleId));
 
 			//문서 가져오기
 			doc = documentDao.getDocumentById(conn, docId);
@@ -240,7 +248,6 @@ public class DocService {
 
 		try {
 			// 전자봉투 개봉하여 문서 비밀 키 복호화 
-			UserRole role = UserRole.fromId(roleId);
 			PrivateKey rolePrivateKey = (PrivateKey) KeyFileService.read(
 					KeyFileService.buildKeyPath(KeyDomain.ROLE, KeyType.PRIVATE, role.name())
 					);

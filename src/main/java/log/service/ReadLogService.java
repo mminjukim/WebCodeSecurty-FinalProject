@@ -21,6 +21,7 @@ import main.java.log.dao.ReadLogDao;
 import main.java.log.dto.ReadLogDto;
 import main.java.user.UserRole;
 import main.java.user.dao.UserDao;
+import main.java.user.service.UserService;
 
 
 
@@ -36,10 +37,13 @@ public class ReadLogService {
 	private final DocumentDao documentDao;
 	private final UserDao userDao;
 
-	public ReadLogService(ReadLogDao readLogDao, DocumentDao documentDao, UserDao userDao) {
+	private final UserService userService;
+
+	public ReadLogService(ReadLogDao readLogDao, DocumentDao documentDao, UserDao userDao, UserService userService) {
 		this.readLogDao = readLogDao;
 		this.documentDao = documentDao;
 		this.userDao = userDao;
+		this.userService = userService;
 	}
 
 	public enum Status {
@@ -87,7 +91,7 @@ public class ReadLogService {
 			// 열람자  정보 조회
 			int userId = DocSystem.loggedInUser.getId();
 			int roleId = DocSystem.loggedInUser.getRoleId();
-			UserRole role = UserRole.fromId(roleId);
+			UserRole role = userService.getRoleByRoleId(roleId);
 
 			// prevHash 조회
 			String prevHash = readLogDao.getLatestLogHashByDocId(conn, docId);
@@ -309,6 +313,9 @@ public class ReadLogService {
 	 */
 	private void validatePermission(Connection conn, int docId, int userId) throws SQLException {
 		int uploaderId = documentDao.getUploaderIdById(conn, docId);
+		if (userService.getRoleByRoleId(userId) == UserRole.ADMIN) {
+			return;
+		}
 		if (uploaderId != userId) {
 			throw new IllegalStateException("해당 문서에 대한 로그 열람 권한이 없습니다.");
 		}

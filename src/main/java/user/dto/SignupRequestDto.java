@@ -5,9 +5,9 @@ import java.util.Arrays;
 public class SignupRequestDto {
 	private final String username;
 	private final char[] password;
-	private final int roleId;
+	private final int roleNo;
 
-	public SignupRequestDto(String username, char[] password, char[] confirmPassword, int roleId) {
+	public SignupRequestDto(String username, char[] password, char[] confirmPassword, int roleNo) {
 		if (username == null || username.trim().isEmpty()) {
 			throw new IllegalArgumentException("아이디는 필수 입력값입니다.");
 		}
@@ -20,7 +20,7 @@ public class SignupRequestDto {
 
 		this.username = username;
 		this.password = password;
-		this.roleId = roleId;
+		this.roleNo = roleNo;
 	}
 
 	public String getUsername() {
@@ -31,7 +31,7 @@ public class SignupRequestDto {
 		return password;
 	}
 
-	public int getRoleId() {
-		return roleId;
+	public int getRoleNo() {
+		return roleNo;
 	}
 }
