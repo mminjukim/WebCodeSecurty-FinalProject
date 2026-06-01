@@ -1,4 +1,4 @@
-package main.java.user;
+package main.java.user.service;
 
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import main.java.infrastructure.database.DBManager;
 import main.java.infrastructure.key.KeyInitializer;
+import main.java.user.UserRole;
 import main.java.user.dao.UserDao;
 import main.java.user.dto.SignupRequestDto;
 import main.java.user.dto.UserDto;

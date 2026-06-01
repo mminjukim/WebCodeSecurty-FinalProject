@@ -14,9 +14,9 @@ import main.java.document.service.EnvelopeService;
 import main.java.log.controller.ReadLogController;
 import main.java.log.dao.ReadLogDao;
 import main.java.log.service.ReadLogService;
-import main.java.user.UserService;
 import main.java.user.controller.UserController;
 import main.java.user.dao.UserDao;
+import main.java.user.service.UserService;
 
 public class AppConfig {
 

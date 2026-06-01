@@ -5,9 +5,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
 import main.java.user.UserRole;
-import main.java.user.UserService;
 import main.java.user.dto.SignupRequestDto;
 import main.java.user.dto.UserDto;
+import main.java.user.service.UserService;
 
 public class UserController {
 
