@@ -46,6 +46,7 @@ public class DocController {
 			System.out.print("   (예시: 1, 2, 3 또는 1 2 3) : ");
 			String inputWhitelist = scanner.nextLine();
 			List<UserRole> whitelist = parseRoles(inputWhitelist);
+			whitelist.add(UserRole.ADMIN);
 
 			System.out.println("[알림] 문서 암호화 및 업로드를 시작합니다...");
 			int insertedId = docService.upload(filePath, whitelist);
@@ -107,23 +108,23 @@ public class DocController {
 		}  catch (IllegalArgumentException | IllegalStateException e) {
 			System.out.println("\n[오류] " + e.getMessage());
 		}
-}
+	}
 
-/**
- * 입력된 역할 번호들을 역할 리스트로 변환
- */
-private List<UserRole> parseRoles(String input) throws IllegalArgumentException {
-	if (input == null || input.trim().isEmpty()) {
-		throw new IllegalArgumentException("열람 허용할 역할을 입력해야 합니다.");
+	/**
+	 * 입력된 역할 번호들을 역할 리스트로 변환
+	 */
+	private List<UserRole> parseRoles(String input) throws IllegalArgumentException {
+		if (input == null || input.trim().isEmpty()) {
+			throw new IllegalArgumentException("열람 허용할 역할을 입력해야 합니다.");
+		}
+		if (input.matches("^[0-9, ]+$") == false) {
+			throw new IllegalArgumentException("숫자, 콤마, 공백만 입력 가능합니다. 잘못된 입력값: " + input);
+		}
+		return Arrays.stream(input.split("[, ]+"))
+				.filter(token -> token.isEmpty() == false)
+				.map(Integer::parseInt)
+				.map(UserRole::fromId)
+				.distinct()
+				.collect(Collectors.toList());
 	}
-	if (input.matches("^[0-9, ]+$") == false) {
-		throw new IllegalArgumentException("숫자, 콤마, 공백만 입력 가능합니다. 잘못된 입력값: " + input);
-	}
-	return Arrays.stream(input.split("[, ]+"))
-			.filter(token -> token.isEmpty() == false)
-			.map(Integer::parseInt)
-			.map(UserRole::fromId)
-			.distinct()
-			.collect(Collectors.toList());
-}
 }

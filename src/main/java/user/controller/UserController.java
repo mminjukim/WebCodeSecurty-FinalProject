@@ -44,8 +44,8 @@ public class UserController {
 		System.out.println("----------------------------------\n");
 
 		try {
-			int roleId = Integer.parseInt(roleInput);
-			SignupRequestDto requestDto = new SignupRequestDto(username, password, confirmPassword, roleId);
+			int roleNo = Integer.parseInt(roleInput);
+			SignupRequestDto requestDto = new SignupRequestDto(username, password, confirmPassword, roleNo);
 			userService.signup(requestDto);
 			System.out.println("::: 회원가입 완료 ::: \n" + username + "님 환영합니다.");
 

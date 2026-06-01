@@ -53,9 +53,9 @@ public class ReadLogController {
 			String result = readLogService.viewLogs(docId);
 
 			System.out.println("[알림] 로그 검증을 성공했습니다.");
-			System.out.println("\n==============LOG===============\n");
+			System.out.println("\n================LOG===============\n");
 			System.out.println(result);
-			System.out.println("\n==================================\n");
+			System.out.println("==================================\n");
 
 		} catch (NumberFormatException e) {
 			System.out.println("[오류] 숫자를 입력하세요.");

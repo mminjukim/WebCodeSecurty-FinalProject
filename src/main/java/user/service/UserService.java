@@ -32,11 +32,12 @@ public class UserService {
 				throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
 			}
 
-			UserRole role = UserRole.fromId(request.getRoleId());
+			UserRole role = UserRole.fromId(request.getRoleNo());
+			int roleId = roleDao.getRoleId(conn, role);
 
 			// 비밀번호 해싱
 			String hashedPassword = PasswordHasher.hash(request.getPassword());
-			UserDto newUser = new UserDto(request.getUsername(), hashedPassword, role.getId());
+			UserDto newUser = new UserDto(request.getUsername(), hashedPassword, roleId);
 
 			// 키 생성
 			newUser = KeyInitializer.initializeUserKeys(newUser);

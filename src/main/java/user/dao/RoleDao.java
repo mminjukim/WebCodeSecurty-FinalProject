@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import main.java.infrastructure.database.QueryExecutor;
 import main.java.infrastructure.database.SqlQueryBuilder;
+import main.java.user.UserRole;
 
 public class RoleDao {
 
@@ -25,5 +26,22 @@ public class RoleDao {
 	        }
 			throw new IllegalArgumentException("해당 ID의 역할 정보를 찾을 수 없습니다: " + id);
 		});
+	}
+	
+	public int getRoleId(Connection conn, UserRole role) throws SQLException {
+		SqlQueryBuilder builder = new SqlQueryBuilder()
+				.select(C_ID)
+				.from(T_ROLE)
+				.where(C_ROLE_NAME + " = ?", role.name());
+		return QueryExecutor.executeSelect(conn, builder, rs -> {
+			if (rs.next()) {
+	            return rs.getInt(C_ID);
+	        }
+			throw new IllegalArgumentException("DB에서 해당 이름의 역할 정보를 찾을 수 없습니다.");
+		});
+	}
+	
+	public int getAdminRoleId(Connection conn) throws SQLException {
+		return getRoleId(conn, UserRole.ADMIN);
 	}
 }
