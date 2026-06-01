@@ -71,6 +71,16 @@ git clone https://github.com/mminjukim/WebCodeSecurty-FinalProject.git
 cd WebCodeSecurty-FinalProject
 ```
 
+#### 프로젝트에 관리자 계정 정보 생성 
+
+프로젝트 디렉토리에 `.admin.txt` 파일 생성 및 관리자 권한으로 생성할 계정 정보 입력 
+
+```bash
+# 예시 
+test_admin
+test_admin_password
+```
+
 #### 소스코드 컴파일 및 실행 
 - **Windows**
     ```bash
