@@ -7,6 +7,7 @@ import main.java.document.controller.DocController;
 import main.java.infrastructure.lifecycle.AppConfig;
 import main.java.infrastructure.lifecycle.ServerLifeCycle;
 import main.java.log.controller.ReadLogController;
+import main.java.user.AdminInitializer;
 import main.java.user.controller.UserController;
 import main.java.user.dto.UserDto;
 
@@ -25,6 +26,9 @@ public class DocSystem {
 		DocController docController = appConfig.getDocController();
 		ReadLogController readLogController = appConfig.getReadLogController();
 		Scanner scanner = appConfig.getScanner();
+
+		// 관리자 계정 초기화
+		AdminInitializer.init(appConfig.getRoleDao(), appConfig.getUserService());
 
 		boolean isRunning = true;
 
@@ -76,7 +80,6 @@ public class DocSystem {
 			ReadLogController readLogController
 	) {
 		System.out.println("\n\n------------ADMIN Menu------------");
-		System.out.println("  - 문서 업로드: [U]pload");
 		System.out.println("  - 문서 열람: [R]ead");
 		System.out.println("  - 문서 로그 확인: [H]istory");
 		System.out.println("  - 사용자 관리: [M]anage");
@@ -86,9 +89,6 @@ public class DocSystem {
 
 		char choice = getMenuChoice(scanner);
 		switch (choice) {
-		case 'U':
-			docController.uploadDocument();
-			break;
 		case 'R':
 			docController.readDocument();
 			break;
