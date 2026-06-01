@@ -75,7 +75,12 @@ local.properties
 # End of https://www.toptal.com/developers/gitignore/api/eclipse
 
 ### Application ###
+
 #키 저장 폴더
 .keys/
+
 #암호화된 문서 저장 폴더
 .document/
+
+# 관리자 계정 정보 
+.admin.txt
