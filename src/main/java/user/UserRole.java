@@ -21,7 +21,7 @@ public enum UserRole {
 		return korName;
 	}
 
-	public static UserRole fromId(int id) {
+	public static UserRole fromRoleNo(int id) {
 		for (UserRole role : values()) {
 			if (role.getRoleNo() == id) {
 				return role;

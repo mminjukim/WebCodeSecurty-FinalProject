@@ -123,7 +123,7 @@ public class DocController {
 		return Arrays.stream(input.split("[, ]+"))
 				.filter(token -> token.isEmpty() == false)
 				.map(Integer::parseInt)
-				.map(UserRole::fromId)
+				.map(UserRole::fromRoleNo)
 				.distinct()
 				.collect(Collectors.toList());
 	}

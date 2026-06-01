@@ -36,7 +36,7 @@ public class DocSystem {
 			if (loggedInUser == null) {
 				isRunning = handleGuestMenu(scanner, userController);
 			} else if (userController.isAdmin(loggedInUser)) {
-				isRunning = handleAdminMenu(scanner, docController, readLogController);
+				isRunning = handleAdminMenu(scanner, docController, userController, readLogController);
 			} else {
 				isRunning = handleUserMenu(scanner, docController, readLogController);
 			}
@@ -77,6 +77,7 @@ public class DocSystem {
 	private static boolean handleAdminMenu(
 			Scanner scanner, 
 			DocController docController,
+			UserController userController,
 			ReadLogController readLogController
 	) {
 		System.out.println("\n\n------------ADMIN Menu------------");
@@ -96,7 +97,7 @@ public class DocSystem {
 			readLogController.viewLogs();
 			break;
 		case 'M':
-			// userController.manageUsers();
+			userController.manageUsers();
 			break;
 		case 'L':
 			System.out.println("\n[알림] 로그아웃 되었습니다.\n");

@@ -3,6 +3,8 @@ package main.java.user.dao;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import main.java.infrastructure.database.QueryExecutor;
 import main.java.infrastructure.database.SqlQueryBuilder;
@@ -95,5 +97,34 @@ public class UserDao {
 	        }
 	        throw new IllegalArgumentException("해당 ID의 사용자 정보를 찾을 수 없습니다: " + id);
 		});
+	}
+
+	public List<UserDto> getAllUsers(Connection conn, int adminRoleId) throws SQLException {
+		SqlQueryBuilder builder = new SqlQueryBuilder()
+				.select(COL_ID, COL_USERNAME, COL_PASSWORD_HASH, COL_PUBLIC_KEY, COL_PRIVATE_KEY, COL_ROLE_ID)
+				.from(TABLE_USERS)
+				.where(COL_ROLE_ID + " != ?", adminRoleId);
+		return QueryExecutor.executeSelect(conn, builder, rs -> {
+			List<UserDto> userList = new ArrayList<>();
+			while (rs.next()) {
+				userList.add(new UserDto(
+						rs.getInt(COL_ID),
+						rs.getString(COL_USERNAME),
+						rs.getString(COL_PASSWORD_HASH),
+						rs.getString(COL_PUBLIC_KEY),
+						rs.getString(COL_PRIVATE_KEY),
+						rs.getInt(COL_ROLE_ID)
+				));
+			}
+			return userList;
+		});
+	}
+
+	public void updateRoleId(Connection conn, int id, int roleId) throws SQLException {
+		SqlQueryBuilder builder = new SqlQueryBuilder()
+				.update(TABLE_USERS)
+				.set(COL_ROLE_ID, roleId)
+				.where(COL_ID + " = ?", id);
+		QueryExecutor.executeUpdate(conn, builder);
 	}
 }
