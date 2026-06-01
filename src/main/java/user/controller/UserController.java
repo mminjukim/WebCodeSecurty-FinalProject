@@ -91,4 +91,11 @@ public class UserController {
 		}
 		return null;
 	}
+
+	/**
+	 * 관리자 여부 판단
+	 */
+	public boolean isAdmin(UserDto user) {
+		return userService.getRoleByRoleId(user.getRoleId()) == UserRole.ADMIN;
+	}
 }

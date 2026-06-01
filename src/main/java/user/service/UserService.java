@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import main.java.infrastructure.database.DBManager;
 import main.java.infrastructure.key.KeyInitializer;
 import main.java.user.UserRole;
+import main.java.user.dao.RoleDao;
 import main.java.user.dao.UserDao;
 import main.java.user.dto.SignupRequestDto;
 import main.java.user.dto.UserDto;
@@ -15,9 +16,11 @@ import main.java.util.PasswordHasher;
 public class UserService {
 
 	private final UserDao userDao;
+	private final RoleDao roleDao;
 
-	public UserService(UserDao userDao) {
+	public UserService(UserDao userDao, RoleDao roleDao) {
 		this.userDao = userDao;
+		this.roleDao = roleDao;
 	}
 
 	/**
@@ -63,6 +66,19 @@ public class UserService {
 			}
 
 			return user;
+
+		} catch (SQLException e) {
+			throw new IllegalStateException("데이터베이스 연결 오류가 발생했습니다.");
+		}
+	}
+
+	/**
+	 * 역할 정보 불러오기
+	 */
+	public UserRole getRoleByRoleId(int roleId) {
+		try (Connection conn = DBManager.getConnection()) {
+			String roleName = roleDao.getNameById(conn, roleId);
+			return UserRole.valueOf(roleName);
 
 		} catch (SQLException e) {
 			throw new IllegalStateException("데이터베이스 연결 오류가 발생했습니다.");
