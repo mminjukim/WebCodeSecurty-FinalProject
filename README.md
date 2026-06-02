@@ -84,6 +84,8 @@ test_admin_password
 #### 소스코드 컴파일 및 실행 
 - **Windows**
     ```bash
+    chcp 65001 
+    
     dir /s /B src\*.java > sources.txt
 
     javac -d bin -cp "lib\*" @sources.txt
