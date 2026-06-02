@@ -19,7 +19,6 @@ import main.document.dao.DocumentDao;
 import main.document.dto.DocumentDto;
 import main.document.exception.DocError;
 import main.log.service.ReadLogService;
-import main.log.service.ReadLogService.FailReason;
 import main.user.dao.RoleDao;
 import main.user.dao.UserDao;
 import main.user.domain.UserRole;
@@ -112,21 +111,10 @@ public class DocReadService {
 
 		} catch (SystemException e) {
 			// 에러 별로 실패 로그 기록
-			if (e.getErrorCode() == DocError.NOT_AUTHORIZED) {
-				readLogService.recordFailLog(docId, FailReason.NO_PERMISSION);
-			} else if (e.getErrorCode() == DocError.DOCUMENT_NOT_FOUND) {
-				readLogService.recordFailLog(docId, FailReason.DOC_NOT_FOUND);
-			} else if (e.getErrorCode() == DocError.INVALID_DOC_SIGNATURE) {
-				readLogService.recordFailLog(docId, FailReason.SIGNATURE_INVALID);
-			} else if (e.getErrorCode() == DocError.DOCUMENT_DECRYPTION_FAILED
-					|| e.getErrorCode() == DocError.SIGNATURE_DECRYPTION_FAILED) {
-				readLogService.recordFailLog(docId, FailReason.DECRYPT_FAIL);
-			} else {
-				readLogService.recordFailLog(docId, FailReason.ERROR);
-			}
+			readLogService.recordFailLog(docId, e);
 			throw e;
 		} catch (SQLException e) {
-			readLogService.recordFailLog(docId, FailReason.ERROR);
+			readLogService.recordFailLog(docId, e);
 			throw new SystemException(Error.DATABASE_ERROR);
 		}
 	}
