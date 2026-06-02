@@ -12,6 +12,7 @@ import main.application.key.KeyFileService;
 import main.application.session.Session;
 import main.common.exception.Error;
 import main.common.exception.SystemException;
+import main.document.exception.DocError;
 import main.log.dao.ReadLogDao;
 import main.log.dto.ReadLogDto;
 import main.user.dao.UserDao;
@@ -72,10 +73,10 @@ public class ReadLogService {
 	 * 실패 로그 저장
 	 * 
 	 * @param docId      열람한 문서 ID
-	 * @param failReason 실패 이유
+	 * @param e			 발생한 예외
 	 */
-	public void recordFailLog(int docId, FailReason failReason) {
-		saveLog(docId, Status.FAIL, failReason);
+	public void recordFailLog(int docId, Exception e) {	
+		saveLog(docId, Status.FAIL, mapFailReason(e));
 	}
 
 	/**
@@ -154,5 +155,30 @@ public class ReadLogService {
 		} catch (SQLException e) {
 			throw new SystemException(Error.DATABASE_ERROR, "로그 불러오기 오류");
 		}
+	}
+	
+	/**
+	 * 실패 사유 판별
+	 * 
+	 * @param 발생한 예외
+	 * @return 실패 사유
+	 */
+	private FailReason mapFailReason(Exception e) {
+		if (e instanceof SystemException se) {
+			if (se.getErrorCode() == DocError.NOT_AUTHORIZED) {
+				return FailReason.NO_PERMISSION;
+			}
+			if (se.getErrorCode() == DocError.DOCUMENT_NOT_FOUND) {
+				return FailReason.DOC_NOT_FOUND;
+			}
+			if (se.getErrorCode() == DocError.INVALID_DOC_SIGNATURE) {
+				return FailReason.SIGNATURE_INVALID;
+			}
+			if (se.getErrorCode() == DocError.DOCUMENT_DECRYPTION_FAILED
+					|| se.getErrorCode() == DocError.SIGNATURE_DECRYPTION_FAILED) {
+				return FailReason.DECRYPT_FAIL;
+			}
+		}
+		return FailReason.ERROR;
 	}
 }
