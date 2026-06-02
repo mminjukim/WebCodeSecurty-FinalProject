@@ -21,6 +21,7 @@ import main.java.log.dao.ReadLogDao;
 import main.java.log.dto.ReadLogDto;
 import main.java.user.UserRole;
 import main.java.user.dao.UserDao;
+import main.java.user.dto.UserDto;
 import main.java.user.service.UserService;
 
 
@@ -139,8 +140,11 @@ public class ReadLogService {
 	public String viewLogs(int docId) {
 		try (Connection conn = DBManager.getConnection()) {
 			//사용자 권한 검증
-			int userId = DocSystem.loggedInUser.getId();
-			validatePermission(conn, docId, userId);
+			UserDto user = DocSystem.loggedInUser;
+			if (userService.getRoleByRoleId(user.getRoleId()) != UserRole.ADMIN) {
+				int userId = user.getId();
+				validatePermission(conn, docId, userId);
+			}
 
 			// 해당 문서 로그 조회
 			List<ReadLogDto> logs = readLogDao.getLogsByDocId(conn, docId);
@@ -297,9 +301,9 @@ public class ReadLogService {
 		sb.append(log.getReadAt())
 		  .append(" READ: ")
 		  .append("user=").append(username)
-		  .append(", role=").append(log.getReaderRole())
-		  .append(", status=").append(log.getStatus())
-		  .append(", fail=").append(log.getFailReason());
+		  .append(",\trole=").append(log.getReaderRole())
+		  .append(",\tstatus=").append(log.getStatus())
+		  .append(",\tfail=").append(log.getFailReason());
 		return sb.toString();
 	}
 	
@@ -307,15 +311,12 @@ public class ReadLogService {
 	 * 역할 권한 검증
 	 * 
 	 * @param conn
-	 * @param docId		문서 id
-	 * @param userId		사용자 id
+	 * @param docId  문서 id
+	 * @param userId 사용자 id
 	 * @return 사용자 권한 검증 결과
 	 */
 	private void validatePermission(Connection conn, int docId, int userId) throws SQLException {
 		int uploaderId = documentDao.getUploaderIdById(conn, docId);
-		if (userService.getRoleByRoleId(userId) == UserRole.ADMIN) {
-			return;
-		}
 		if (uploaderId != userId) {
 			throw new IllegalStateException("해당 문서에 대한 로그 열람 권한이 없습니다.");
 		}

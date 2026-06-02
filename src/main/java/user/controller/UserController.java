@@ -107,6 +107,11 @@ public class UserController {
 		System.out.println("\n-----------Manage Users-----------\n");
 
 		List<UserDto> allUsers = userService.getAllUsers();
+		if (allUsers == null || allUsers.isEmpty()) {
+			System.out.println("[알림] 등록된 사용자가 없습니다.\n");
+			return;
+		}
+
 		for (int i = 0; i < allUsers.size(); i++) {
 			UserDto user = allUsers.get(i);
 			String roleName = userService.getRoleByRoleId(user.getRoleId()).getKorName();
@@ -117,7 +122,12 @@ public class UserController {
 		String strInput = scanner.nextLine();
 
 		try {
-			UserDto user = allUsers.get(Integer.parseInt(strInput) - 1);
+			int userIdx = Integer.parseInt(strInput) - 1;
+			if (userIdx < 0 || userIdx >= allUsers.size()) {
+				throw new IllegalArgumentException("올바른 사용자 번호를 입력해주세요.");
+			}
+
+			UserDto user = allUsers.get(userIdx);
 
 			System.out.print("2. 새로 부여할 역할을 입력하세요 (숫자만 입력. " + UserRole.getNumberAndKorName() + "): ");
 			int roleNo = Integer.parseInt(scanner.nextLine());
@@ -129,6 +139,8 @@ public class UserController {
 
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException("역할은 숫자로 입력해야 합니다.");
+		} catch (IllegalArgumentException e) {
+			System.out.println("[오류] " + e.getMessage());
 		}
 
 		System.out.println("----------------------------------\n");
