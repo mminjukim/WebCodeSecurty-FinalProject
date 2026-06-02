@@ -6,9 +6,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import main.infrastructure.database.QueryExecutor;
-import main.infrastructure.database.SqlQueryBuilder;
 import main.user.dto.UserDto;
+import main.util.QueryExecutor;
+import main.util.SqlQueryBuilder;
 
 public class UserDao {
 

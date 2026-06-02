@@ -1,4 +1,4 @@
-package main.infrastructure.key;
+package main.application.key;
 
 import java.io.File;
 import java.io.FileInputStream;

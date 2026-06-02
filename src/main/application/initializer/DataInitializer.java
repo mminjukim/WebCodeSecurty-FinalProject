@@ -1,10 +1,12 @@
-package main.infrastructure.database;
+package main.application.initializer;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import main.infrastructure.key.KeyInitializer;
+import main.application.database.DBManager;
+import main.util.QueryExecutor;
+import main.util.SqlQueryBuilder;
 
 /**
  * 데이터 초기화

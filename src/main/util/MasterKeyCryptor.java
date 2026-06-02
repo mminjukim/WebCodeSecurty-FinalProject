@@ -12,7 +12,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
-import main.infrastructure.key.MasterKeyManager;
+import main.application.key.MasterKeyManager;
 
 public class MasterKeyCryptor {
 	

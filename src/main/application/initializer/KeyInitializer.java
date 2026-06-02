@@ -1,4 +1,4 @@
-package main.infrastructure.key;
+package main.application.initializer;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -6,17 +6,16 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import main.infrastructure.database.DBManager;
-import main.infrastructure.database.QueryExecutor;
-import main.infrastructure.database.SqlQueryBuilder;
-import main.infrastructure.key.KeyFileService.KeyDomain;
-import main.infrastructure.key.KeyFileService.KeyType;
-import main.user.UserRole;
+import main.application.database.DBManager;
+import main.application.key.KeyFileService;
+import main.application.key.KeyFileService.KeyDomain;
+import main.application.key.KeyFileService.KeyType;
+import main.user.domain.UserRole;
 import main.user.dto.UserDto;
-import main.util.MasterKeyCryptor;
+import main.util.QueryExecutor;
+import main.util.SqlQueryBuilder;
 
 /**
  * 키 초기화

@@ -1,16 +1,12 @@
-package main.infrastructure.key;
+package main.application.key;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Key;
-import java.util.List;
 
 public class KeyFileService {
 
@@ -42,29 +38,6 @@ public class KeyFileService {
 
 		public String getDirName() {
 			return dirName;
-		}
-	}
-
-	/**
-	 * 키 디렉토리 생성하기
-	 */
-	public static void makeKeyDirs() {
-		List<String> keyDirs = List.of(
-				".keys/user/private", 
-				".keys/user/public", 
-				".keys/role/public",
-				".keys/role/private"
-		);
-		for (String dirPath : keyDirs) {
-			Path path = Paths.get(dirPath);
-			try {
-				Files.createDirectories(path);
-			} catch (FileAlreadyExistsException e) {
-				continue;
-			} catch (IOException e) {
-				System.out.println("[오류] 초기 키 디렉토리 구성에 실패했습니다:" + path);
-				System.exit(1);
-			}
 		}
 	}
 

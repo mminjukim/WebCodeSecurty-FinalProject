@@ -1,4 +1,4 @@
-package main.infrastructure.database;
+package main.util;
 
 import java.util.ArrayList;
 import java.util.Collections;

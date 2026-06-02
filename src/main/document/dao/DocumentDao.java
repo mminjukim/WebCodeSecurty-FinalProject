@@ -7,8 +7,8 @@ import java.util.List;
 
 import main.document.dto.DocumentDto;
 import main.document.dto.DocumentSummaryDto;
-import main.infrastructure.database.QueryExecutor;
-import main.infrastructure.database.SqlQueryBuilder;
+import main.util.QueryExecutor;
+import main.util.SqlQueryBuilder;
 
 public class DocumentDao {
 

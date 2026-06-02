@@ -1,21 +1,17 @@
 package main;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
+import main.application.lifecycle.AppConfig;
+import main.application.lifecycle.ServerLifeCycle;
+import main.application.session.Session;
 import main.document.controller.DocController;
-import main.infrastructure.lifecycle.AppConfig;
-import main.infrastructure.lifecycle.ServerLifeCycle;
 import main.log.controller.ReadLogController;
-import main.user.AdminInitializer;
 import main.user.controller.UserController;
-import main.user.dto.UserDto;
 
 public class DocSystem {
 
-	public static UserDto loggedInUser = null;
-
-	public static void main(String[] args) throws NoSuchAlgorithmException {
+	public static void main(String[] args) {
 
 		// 프로그램 시작
 		ServerLifeCycle.start();
@@ -27,18 +23,21 @@ public class DocSystem {
 		ReadLogController readLogController = appConfig.getReadLogController();
 		Scanner scanner = appConfig.getScanner();
 
+		// 로그인 정보
+		Session session = appConfig.getSession();
+
 		// 관리자 계정 초기화
-		AdminInitializer.init(appConfig.getRoleDao(), appConfig.getUserService());
+		appConfig.getAdminInitializer().init(appConfig.getUserService());
 
 		boolean isRunning = true;
 
 		while (isRunning) {
-			if (loggedInUser == null) {
-				isRunning = handleGuestMenu(scanner, userController);
-			} else if (userController.isAdmin(loggedInUser)) {
-				isRunning = handleAdminMenu(scanner, docController, userController, readLogController);
+			if (session.isLoggedIn() == false) {
+				isRunning = handleGuestMenu(scanner, userController, session);
+			} else if (userController.isAdmin(session.getCurrentUser())) {
+				isRunning = handleAdminMenu(scanner, docController, userController, readLogController, session);
 			} else {
-				isRunning = handleUserMenu(scanner, docController, readLogController);
+				isRunning = handleUserMenu(scanner, docController, readLogController, session);
 			}
 		}
 
@@ -47,7 +46,7 @@ public class DocSystem {
 	}
 
 	// 비로그인 사용자 메뉴
-	private static boolean handleGuestMenu(Scanner scanner, UserController userController) {
+	private static boolean handleGuestMenu(Scanner scanner, UserController userController, Session session) {
 		System.out.println("\n\n---------------Menu---------------");
 		System.out.println("  - 회원가입: [S]ignup");
 		System.out.println("  - 로그인: [L]ogin");
@@ -61,7 +60,7 @@ public class DocSystem {
 			System.out.println();
 			break;
 		case 'L':
-			loggedInUser = userController.processLogin();
+			session.login(userController.processLogin());
 			System.out.println();
 			break;
 		case 'Q':
@@ -78,7 +77,8 @@ public class DocSystem {
 			Scanner scanner, 
 			DocController docController,
 			UserController userController,
-			ReadLogController readLogController
+			ReadLogController readLogController,
+			Session session
 	) {
 		System.out.println("\n\n------------ADMIN Menu------------");
 		System.out.println("  - 문서 열람: [R]ead");
@@ -101,7 +101,7 @@ public class DocSystem {
 			break;
 		case 'L':
 			System.out.println("\n[알림] 로그아웃 되었습니다.\n");
-			loggedInUser = null;
+			session.logout();
 			break;
 		case 'Q':
 			System.out.println("\n[알림] 프로그램을 종료합니다.\n");
@@ -116,7 +116,7 @@ public class DocSystem {
 	private static boolean handleUserMenu(
 			Scanner scanner, 
 			DocController docController,
-			ReadLogController readLogController
+			ReadLogController readLogController, Session session
 	) {
 		System.out.println("\n\n---------------Menu---------------");
 		System.out.println("  - 문서 업로드: [U]pload");
@@ -139,7 +139,7 @@ public class DocSystem {
 			break;
 		case 'L':
 			System.out.println("\n[알림] 로그아웃 되었습니다.\n");
-			loggedInUser = null;
+			session.logout();
 			break;
 		case 'Q':
 			System.out.println("\n[알림] 프로그램을 종료합니다.\n");

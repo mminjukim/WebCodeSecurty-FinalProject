@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import main.document.dto.DocumentSummaryDto;
 import main.document.service.DocService;
-import main.user.UserRole;
+import main.user.domain.UserRole;
 
 public class DocController {
 
@@ -32,7 +32,7 @@ public class DocController {
 			String filePath = scanner.nextLine();
 
 			// 빈 문자열 체크
-			if (filePath == null || filePath.isEmpty()) {
+			if (filePath == null || filePath.trim().isEmpty()) {
 				throw new IllegalArgumentException("파일명을 입력해주세요.");
 			}
 
@@ -49,9 +49,7 @@ public class DocController {
 			whitelist.add(UserRole.ADMIN);
 
 			System.out.println("[알림] 문서 암호화 및 업로드를 시작합니다...");
-			int insertedId = docService.upload(filePath, whitelist);
-			System.out.println("[알림] 권한 정보를 저장합니다...");
-			docService.saveWhitelist(insertedId, whitelist);
+			docService.upload(filePath, whitelist);
 			System.out.println("[알림] 문서가 성공적으로 업로드되었습니다.");
 
 			System.out.println("----------------------------------\n");
@@ -84,14 +82,22 @@ public class DocController {
 
 			System.out.print("\n열람할 문서의 번호를 입력하세요: ");
 			String docInput = scanner.nextLine();
+			if (docInput == null || docInput.trim().isEmpty()) {
+				System.out.println("[오류] 문서의 번호를 입력하세요.");
+				return;
+			}
 
 			int docId = Integer.parseInt(docInput);
+			if (docId <= 0 || docId > documents.size()) {
+				System.out.println("[오류] 올바른 문서의 번호를 입력하세요.");
+				return;
+			}
 
 			//해당하는 번호의 문서가 없을때
 			List<Integer> ids = documents.stream()
 					.map(DocumentSummaryDto::getId)
 					.toList();
-			if (!ids.contains(docId)) {
+			if (ids.contains(docId) == false) {
 				throw new IllegalArgumentException("해당 번호의 문서가 존재하지 않습니다.");
 			}
 

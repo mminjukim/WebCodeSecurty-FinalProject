@@ -5,11 +5,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-import main.infrastructure.database.DBManager;
-import main.infrastructure.key.KeyInitializer;
-import main.user.UserRole;
+import main.application.database.DBManager;
+import main.application.initializer.KeyInitializer;
 import main.user.dao.RoleDao;
 import main.user.dao.UserDao;
+import main.user.domain.UserRole;
 import main.user.dto.SignupRequestDto;
 import main.user.dto.UserDto;
 import main.util.PasswordHasher;

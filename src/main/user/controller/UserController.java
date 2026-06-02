@@ -5,7 +5,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Scanner;
 
-import main.user.UserRole;
+import main.application.session.Session;
+import main.user.domain.UserRole;
 import main.user.dto.SignupRequestDto;
 import main.user.dto.UserDto;
 import main.user.service.UserService;
@@ -16,7 +17,7 @@ public class UserController {
 	private final Scanner scanner;
 	private final Console console;
 
-	public UserController(Scanner scanner, Console console, UserService userService) {
+	public UserController(Scanner scanner, Console console, UserService userService, Session session) {
 		this.scanner = scanner;
 		this.console = console;
 		this.userService = userService;
@@ -36,16 +37,38 @@ public class UserController {
 		System.out.print("1. 아이디를 입력하세요: ");
 		String username = scanner.nextLine();
 
+		if (username == null || username.trim().isEmpty()) {
+			System.out.println("[오류] 아이디는 필수로 입력해야 합니다.");
+			return;
+		}
+
 		System.out.print("2. 역할을 입력하세요 (숫자만 입력. " + UserRole.getNumberAndKorName() + "): ");
 		String roleInput = scanner.nextLine();
 
+		if (roleInput == null || roleInput.trim().isEmpty()) {
+			System.out.println("[오류] 역할은 필수로 입력해야 합니다.");
+			return;
+		}
+
 		char[] password = console.readPassword("3. 비밀번호를 입력하세요: ");
+		if (password == null || password.length == 0) {
+			System.out.println("[오류] 비밀번호는 필수로 입력해야 합니다.");
+			return;
+		}
+
 		char[] confirmPassword = console.readPassword("4. 비밀번호를 다시 입력하세요: ");
+		if (confirmPassword == null || confirmPassword.length == 0) {
+			System.out.println("[오류] 비밀번호는 필수로 입력해야 합니다.");
+			return;
+		}
 
 		System.out.println("----------------------------------\n");
 
 		try {
-			int roleNo = Integer.parseInt(roleInput);
+			int roleNo = Integer.parseInt(roleInput.trim());
+			if (roleNo == 0) {
+				throw new IllegalArgumentException("유효하지 않은 역할 번호입니다.");
+			}
 			SignupRequestDto requestDto = new SignupRequestDto(username, password, confirmPassword, roleNo);
 			userService.signup(requestDto);
 			System.out.println("::: 회원가입 완료 ::: \n" + username + "님 환영합니다.");
@@ -120,17 +143,31 @@ public class UserController {
 
 		System.out.print("\n1. 역할을 변경할 사용자를 선택해주세요 ([번호] 입력): ");
 		String strInput = scanner.nextLine();
+		if (strInput == null || strInput.trim().isEmpty()) {
+			System.out.println("[오류] 사용자 번호를 입력하세요.");
+			return;
+		}
 
 		try {
 			int userIdx = Integer.parseInt(strInput) - 1;
 			if (userIdx < 0 || userIdx >= allUsers.size()) {
-				throw new IllegalArgumentException("올바른 사용자 번호를 입력해주세요.");
+				System.out.println("[오류] 올바른 사용자 번호를 입력하세요.");
+				return;
 			}
 
 			UserDto user = allUsers.get(userIdx);
 
 			System.out.print("2. 새로 부여할 역할을 입력하세요 (숫자만 입력. " + UserRole.getNumberAndKorName() + "): ");
-			int roleNo = Integer.parseInt(scanner.nextLine());
+			String roleInput = scanner.nextLine();
+			if (roleInput == null || roleInput.trim().isEmpty()) {
+				System.out.println("[오류] 역할은 필수로 입력해야 합니다.");
+				return;
+			}
+			int roleNo = Integer.parseInt(roleInput);
+			if (roleNo == 0) {
+				System.out.println("[오류] 유효하지 않은 역할 번호입니다.");
+				return;
+			}
 
 			userService.changeUserRole(user, roleNo);
 			

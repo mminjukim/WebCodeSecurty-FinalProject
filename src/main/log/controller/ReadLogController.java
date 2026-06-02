@@ -39,7 +39,17 @@ public class ReadLogController {
 			}
 
 			System.out.print("\n로그를 확인할 문서의 번호를 입력하세요 : ");	
-			int docId = Integer.parseInt(scanner.nextLine());
+			String docInput = scanner.nextLine();
+			if (docInput == null || docInput.trim().isEmpty()) {
+				System.out.println("[오류] 문서의 번호를 입력하세요.");
+				return;
+			}
+
+			int docId = Integer.parseInt(docInput);
+			if (docId <= 0 || docId > documents.size()) {
+				System.out.println("[오류] 올바른 문서의 번호를 입력하세요.");
+				return;
+			}
 
 			//문서 존재 유무 확인
 			List<Integer> ids = documents.stream()

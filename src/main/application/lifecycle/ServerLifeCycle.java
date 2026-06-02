@@ -1,8 +1,7 @@
-package main.infrastructure.lifecycle;
+package main.application.lifecycle;
 
-import main.document.service.DocService;
-import main.infrastructure.database.DataInitializer;
-import main.infrastructure.key.KeyFileService;
+import main.application.initializer.DataInitializer;
+import main.application.initializer.DirectoryInitializer;
 
 public class ServerLifeCycle {
 
@@ -11,12 +10,12 @@ public class ServerLifeCycle {
 	}
 
 	public static final void start() {
-//		DataInitializer.dropAllTables(); // 필요에 따라 주석 처리
+		DataInitializer.dropAllTables(); // 필요에 따라 주석 처리
 
 		DataInitializer.createTables();
-		KeyFileService.makeKeyDirs();
+		DirectoryInitializer.makeKeyDir();
+		DirectoryInitializer.makeDocumentDir();
 		DataInitializer.initializeRoles();
-		DocService.makeDocumentDir();
 
 		printWelcome();
 	}

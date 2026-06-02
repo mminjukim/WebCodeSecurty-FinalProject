@@ -7,6 +7,9 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 
+/**
+ * 문서 전자서명 생성
+ */
 public class DocSignatureService {
 
 	private static final int BUFFER_SIZE = 1024; // 1KB

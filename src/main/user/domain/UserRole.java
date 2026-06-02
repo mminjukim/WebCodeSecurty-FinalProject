@@ -1,4 +1,4 @@
-package main.user;
+package main.user.domain;
 
 import java.util.ArrayList;
 
@@ -21,13 +21,13 @@ public enum UserRole {
 		return korName;
 	}
 
-	public static UserRole fromRoleNo(int id) {
+	public static UserRole fromRoleNo(int roleNo) {
 		for (UserRole role : values()) {
-			if (role.getRoleNo() == id) {
+			if (role.getRoleNo() == roleNo) {
 				return role;
 			}
 		}
-		throw new IllegalArgumentException("유효하지 않은 역할 번호입니다: " + id);
+		throw new IllegalArgumentException("유효하지 않은 역할 번호입니다.");
 	}
 
 	public static String getNumberAndKorName() {

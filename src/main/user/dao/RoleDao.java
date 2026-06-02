@@ -3,9 +3,9 @@ package main.user.dao;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import main.infrastructure.database.QueryExecutor;
-import main.infrastructure.database.SqlQueryBuilder;
-import main.user.UserRole;
+import main.user.domain.UserRole;
+import main.util.QueryExecutor;
+import main.util.SqlQueryBuilder;
 
 public class RoleDao {
 
