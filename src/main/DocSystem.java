@@ -5,6 +5,7 @@ import java.util.Scanner;
 import main.application.lifecycle.AppConfig;
 import main.application.lifecycle.ServerLifeCycle;
 import main.application.session.Session;
+import main.common.exception.ExceptionHandler;
 import main.document.controller.DocController;
 import main.log.controller.ReadLogController;
 import main.user.controller.UserController;
@@ -26,18 +27,26 @@ public class DocSystem {
 		// 로그인 정보
 		Session session = appConfig.getSession();
 
-		// 관리자 계정 초기화
-		appConfig.getAdminInitializer().init(appConfig.getUserService());
+		try {
+			// 관리자 계정 초기화
+			appConfig.getAdminInitializer().init(appConfig.getUserService());
+		} catch (Exception e) {
+			ExceptionHandler.handle(e);
+		}
 
 		boolean isRunning = true;
 
 		while (isRunning) {
-			if (session.isLoggedIn() == false) {
-				isRunning = handleGuestMenu(scanner, userController, session);
-			} else if (userController.isAdmin(session.getCurrentUser())) {
-				isRunning = handleAdminMenu(scanner, docController, userController, readLogController, session);
-			} else {
-				isRunning = handleUserMenu(scanner, docController, readLogController, session);
+			try {
+				if (session.isLoggedIn() == false) {
+					isRunning = handleGuestMenu(scanner, userController, session);
+				} else if (userController.isAdmin(session.getCurrentUser())) {
+					isRunning = handleAdminMenu(scanner, docController, userController, readLogController, session);
+				} else {
+					isRunning = handleUserMenu(scanner, docController, readLogController, session);
+				}
+			} catch (Exception e) {
+				ExceptionHandler.handle(e);
 			}
 		}
 

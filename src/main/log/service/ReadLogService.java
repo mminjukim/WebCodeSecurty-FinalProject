@@ -1,6 +1,7 @@
 package main.log.service;
 import java.security.PrivateKey;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
@@ -9,6 +10,8 @@ import java.util.List;
 import main.application.database.DBManager;
 import main.application.key.KeyFileService;
 import main.application.session.Session;
+import main.common.exception.Error;
+import main.common.exception.SystemException;
 import main.log.dao.ReadLogDao;
 import main.log.dto.ReadLogDto;
 import main.user.dao.UserDao;
@@ -114,8 +117,8 @@ public class ReadLogService {
 			readLogDao.insertReadLog(conn, new ReadLogDto(docId, userId, role.name(), status.name(), failReason.name(),
 					prevHash, currentHash, signature, readAt));
 
-		} catch (Exception e) {
-			throw new IllegalStateException("로그 기록을 실패했습니다.", e);
+		} catch (SQLException e) {
+			throw new SystemException(Error.DATABASE_ERROR, "로그 저장 실패");
 		}
 	}
 
@@ -134,7 +137,8 @@ public class ReadLogService {
 			// DB에서 로그 불러오기
 			List<ReadLogDto> logs = readLogDao.getLogsByDocId(conn, docId);
 			if (logs.isEmpty()) {
-				throw new IllegalStateException("조회된 로그가 없습니다.");
+				System.out.println("\n[알림] 기록된 로그가 없습니다.\n");
+				return null;
 			}
 
 			// 로그 무결성 검증
@@ -147,8 +151,8 @@ public class ReadLogService {
 			}
 			return sb.toString();
 
-		} catch (Exception e) {
-			throw new IllegalStateException(e.getMessage());
+		} catch (SQLException e) {
+			throw new SystemException(Error.DATABASE_ERROR, "로그 불러오기 오류");
 		}
 	}
 }

@@ -9,7 +9,9 @@ import java.util.Base64;
 import java.util.List;
 
 import main.application.key.KeyFileService;
+import main.common.exception.SystemException;
 import main.log.dto.ReadLogDto;
+import main.log.exception.LogError;
 import main.user.dao.UserDao;
 
 /**
@@ -45,7 +47,7 @@ public class ReadLogIntegrityService {
 			signature.update(data.getBytes(StandardCharsets.UTF_8));
 			return signature.sign();
 		} catch (Exception e) {
-			throw new IllegalStateException("전자서명 생성 중 오류가 발생했습니다.");
+			throw new SystemException(LogError.SIGNATURE_CREATION_FAILED);
 		}
 	}
 
@@ -60,7 +62,7 @@ public class ReadLogIntegrityService {
 
 		for (ReadLogDto log : logs) {
 			if (!log.getPrevHash().equals(expectedPrevHash)) {
-				throw new IllegalStateException("로그 해시 체이닝이 불일치합니다.");
+				throw new SystemException(LogError.INVALID_HASH_CHAIN);
 			}
 
 			String signData = buildSignData(log);
@@ -72,16 +74,16 @@ public class ReadLogIntegrityService {
 				verifier.initVerify(publicKey);
 				verifier.update(signData.getBytes(StandardCharsets.UTF_8));
 
-				if (!verifier.verify(log.getSignature())) {
-					throw new IllegalStateException("로그 전자서명 검증에 실패했습니다.");
+				if (verifier.verify(log.getSignature()) == false) {
+					throw new SystemException(LogError.INVALID_LOG_SIGNATURE);
 				}
 			} catch (Exception e) {
-				throw new IllegalStateException("로그 전자서명 검증에 실패했습니다.", e);
+				throw new SystemException(LogError.INVALID_LOG_SIGNATURE);
 			}
 
 			String expectedCurrentHash = hash(signData + Base64.getEncoder().encodeToString(log.getSignature()));
 			if (!expectedCurrentHash.equals(log.getCurrentHash())) {
-				throw new IllegalStateException("로그 무결성 검증을 실패했습니다.");
+				throw new SystemException(LogError.LOG_INTEGRATION_FAILED);
 			}
 
 			expectedPrevHash = log.getCurrentHash();
@@ -99,7 +101,7 @@ public class ReadLogIntegrityService {
 			MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
 			return Base64.getEncoder().encodeToString(md.digest(data.getBytes(StandardCharsets.UTF_8)));
 		} catch (Exception e) {
-			throw new IllegalStateException("해시 생성 중 오류가 발생했습니다.", e);
+			throw new SystemException(LogError.HASH_GENERATION_FAILED);
 		}
 	}
 

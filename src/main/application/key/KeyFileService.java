@@ -8,6 +8,9 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Paths;
 import java.security.Key;
 
+import main.common.exception.Error;
+import main.common.exception.SystemException;
+
 public class KeyFileService {
 
 	private static final String KEY_ROOT_DIR = ".keys/";
@@ -65,7 +68,7 @@ public class KeyFileService {
 			Object obj = ois.readObject();
 			return (Key) obj;
 		} catch (ClassNotFoundException | IOException e) {
-			throw new RuntimeException("키를 불러오는 중 오류가 발생했습니다.");
+			throw new SystemException(Error.KEY_PROCESS_ERROR, "불러오기 오류");
 		}
 	}
 
@@ -80,7 +83,7 @@ public class KeyFileService {
 				ObjectOutputStream ostream = new ObjectOutputStream(fstream)) {
 			ostream.writeObject(key);	
 		} catch (IOException e) {
-			throw new RuntimeException("키 저장 중 오류가 발생했습니다.");
+			throw new SystemException(Error.KEY_PROCESS_ERROR, "저장 오류");
 		}
 	}
 }

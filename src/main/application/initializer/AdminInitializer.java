@@ -2,11 +2,13 @@ package main.application.initializer;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
+import main.common.exception.Error;
+import main.common.exception.SystemException;
 import main.user.domain.UserRole;
 import main.user.dto.SignupRequestDto;
+import main.user.exception.UserError;
 import main.user.service.UserService;
 
 /**
@@ -28,7 +30,7 @@ public class AdminInitializer {
 		AdminCredentials credentials = readCredentials();
 
 		if (credentials == null || credentials.username.isEmpty() || credentials.password.length == 0) {
-			throw new IllegalStateException("관리자 계정 정보 파일을 읽을 수 없습니다.");
+			throw new SystemException(Error.FILE_NOT_FOUND, "관리자 계정 정보");
 		}
 
 		try {
@@ -39,12 +41,11 @@ public class AdminInitializer {
 					UserRole.ADMIN.getRoleNo()
 			);
 			userService.signup(request);
-		} catch (IllegalArgumentException e) {
-			if (!"이미 사용 중인 아이디입니다.".equals(e.getMessage())) {
-				throw e;
+
+		} catch (SystemException e) {
+			if (e.getErrorCode() == UserError.USER_ALREADY_EXISTS) {
+				return;
 			}
-		} catch (NoSuchAlgorithmException e) {
-			throw new IllegalStateException("관리자 계정 비밀번호 해싱 중 오류가 발생했습니다.");
 		} finally {
 			Arrays.fill(credentials.password, (char) 0);
 		}

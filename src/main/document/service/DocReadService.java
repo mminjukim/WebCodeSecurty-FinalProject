@@ -4,6 +4,7 @@ import java.nio.file.Paths;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.crypto.SecretKey;
 
@@ -12,8 +13,11 @@ import main.application.key.KeyFileService;
 import main.application.key.KeyFileService.KeyDomain;
 import main.application.key.KeyFileService.KeyType;
 import main.application.session.Session;
+import main.common.exception.Error;
+import main.common.exception.SystemException;
 import main.document.dao.DocumentDao;
 import main.document.dto.DocumentDto;
+import main.document.exception.DocError;
 import main.log.service.ReadLogService;
 import main.log.service.ReadLogService.FailReason;
 import main.user.dao.RoleDao;
@@ -65,12 +69,12 @@ public class DocReadService {
 			int roleId = session.getCurrentUser().getRoleId();
 
 			// 문서 열람 권한 확인
-			permissionService.validateReadable(conn, docId, roleId);
+			permissionService.validate(conn, docId, roleId);
 
 			// DB에서 문서 정보 불러오기
 			DocumentDto doc = documentDao.getDocumentById(conn, docId);
 			if (doc == null) {
-				throw new IllegalStateException("해당하는 문서가 존재하지 않습니다.");
+				throw new SystemException(DocError.DOCUMENT_NOT_FOUND);
 			}
 
 			// 역할 개인 키 불러오기
@@ -98,7 +102,7 @@ public class DocReadService {
 
 			// 업로더 공개 키로 전자서명 검증
 			if (signatureService.verifySignature(content, signature, uploaderPublicKey) == false) {
-				throw new IllegalStateException("문서 검증을 실패했습니다.");
+				throw new SystemException(DocError.INVALID_DOC_SIGNATURE);
 			}
 
 			// 열람 로그 기록
@@ -106,17 +110,24 @@ public class DocReadService {
 
 			return content;
 
-		} catch (IllegalArgumentException e) {
-			readLogService.recordFailLog(docId, FailReason.NO_PERMISSION);
-			throw new IllegalStateException(e.getMessage(), e);
-
-		} catch (IllegalStateException e) {
-			readLogService.recordFailLog(docId, FailReason.ERROR);
+		} catch (SystemException e) {
+			// 에러 별로 실패 로그 기록
+			if (e.getErrorCode() == DocError.NOT_AUTHORIZED) {
+				readLogService.recordFailLog(docId, FailReason.NO_PERMISSION);
+			} else if (e.getErrorCode() == DocError.DOCUMENT_NOT_FOUND) {
+				readLogService.recordFailLog(docId, FailReason.DOC_NOT_FOUND);
+			} else if (e.getErrorCode() == DocError.INVALID_DOC_SIGNATURE) {
+				readLogService.recordFailLog(docId, FailReason.SIGNATURE_INVALID);
+			} else if (e.getErrorCode() == DocError.DOCUMENT_DECRYPTION_FAILED
+					|| e.getErrorCode() == DocError.SIGNATURE_DECRYPTION_FAILED) {
+				readLogService.recordFailLog(docId, FailReason.DECRYPT_FAIL);
+			} else {
+				readLogService.recordFailLog(docId, FailReason.ERROR);
+			}
 			throw e;
-
-		} catch (Exception e) {
-			readLogService.recordFailLog(docId, FailReason.DECRYPT_FAIL);
-			throw new IllegalStateException("문서 복호화 및 검증을 중단합니다.", e);
+		} catch (SQLException e) {
+			readLogService.recordFailLog(docId, FailReason.ERROR);
+			throw new SystemException(Error.DATABASE_ERROR);
 		}
 	}
 

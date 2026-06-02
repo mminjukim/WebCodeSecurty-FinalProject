@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import main.application.session.Session;
+import main.common.exception.Error;
+import main.common.exception.SystemException;
 import main.document.dao.DocumentDao;
+import main.log.exception.LogError;
 import main.user.domain.UserRole;
 import main.user.service.UserService;
 
@@ -41,10 +44,10 @@ public class ReadLogPermissionService {
 		try {
 			int uploaderId = documentDao.getUploaderIdById(conn, docId);
 			if (uploaderId != currentUserId) {
-				throw new IllegalStateException("해당 문서에 대한 로그 열람 권한이 없습니다.");
+				throw new SystemException(LogError.NOT_AUTHORIZED);
 			}
 		} catch (SQLException e) {
-			throw new IllegalStateException("문서 업로더 정보를 가져오는 중 오류가 발생했습니다.");
+			throw new SystemException(Error.DATABASE_ERROR, "문서 업로더 정보 조회 오류");
 		}
 	}
 }

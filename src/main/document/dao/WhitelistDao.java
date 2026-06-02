@@ -3,8 +3,8 @@ package main.document.dao;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import main.util.QueryExecutor;
-import main.util.SqlQueryBuilder;
+import main.common.util.QueryExecutor;
+import main.common.util.SqlQueryBuilder;
 
 public class WhitelistDao {
 

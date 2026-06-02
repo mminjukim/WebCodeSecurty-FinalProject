@@ -1,4 +1,4 @@
-package main.util;
+package main.common.util;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;

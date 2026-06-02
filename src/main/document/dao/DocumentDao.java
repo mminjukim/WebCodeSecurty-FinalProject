@@ -5,10 +5,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import main.common.util.QueryExecutor;
+import main.common.util.SqlQueryBuilder;
 import main.document.dto.DocumentDto;
 import main.document.dto.DocumentSummaryDto;
-import main.util.QueryExecutor;
-import main.util.SqlQueryBuilder;
 
 public class DocumentDao {
 

@@ -3,9 +3,11 @@ package main.user.dao;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import main.common.exception.SystemException;
+import main.common.util.QueryExecutor;
+import main.common.util.SqlQueryBuilder;
 import main.user.domain.UserRole;
-import main.util.QueryExecutor;
-import main.util.SqlQueryBuilder;
+import main.user.exception.UserError;
 
 public class RoleDao {
 
@@ -24,7 +26,7 @@ public class RoleDao {
 			if (rs.next()) {
 	            return rs.getString(C_ROLE_NAME);
 	        }
-			throw new IllegalArgumentException("해당 ID의 역할 정보를 찾을 수 없습니다: " + id);
+			throw new SystemException(UserError.ROLE_NOT_FOUND);
 		});
 	}
 	
@@ -37,7 +39,7 @@ public class RoleDao {
 			if (rs.next()) {
 	            return rs.getInt(C_ID);
 	        }
-			throw new IllegalArgumentException("DB에서 해당 이름의 역할 정보를 찾을 수 없습니다.");
+			throw new SystemException(UserError.ROLE_NOT_FOUND);
 		});
 	}
 	

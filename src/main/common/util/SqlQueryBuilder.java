@@ -1,8 +1,11 @@
-package main.util;
+package main.common.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import main.common.exception.Error;
+import main.common.exception.SystemException;
 
 public class SqlQueryBuilder {
 
@@ -142,7 +145,7 @@ public class SqlQueryBuilder {
 		} else if (this.queryType == QueryType.UPDATE) {
 			return buildUpdateQuery();
 		}
-		throw new IllegalStateException("쿼리 타입이 지정되지 않음");
+		throw new SystemException(Error.DATABASE_ERROR, "쿼리 타입 미지정");
 	}
 
 	private String buildSelectQuery() {

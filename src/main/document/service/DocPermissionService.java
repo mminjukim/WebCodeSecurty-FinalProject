@@ -3,7 +3,9 @@ package main.document.service;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import main.common.exception.SystemException;
 import main.document.dao.WhitelistDao;
+import main.document.exception.DocError;
 import main.user.dao.RoleDao;
 import main.user.domain.UserRole;
 
@@ -28,7 +30,7 @@ public class DocPermissionService {
 	 * @param roleId 역할 ID
 	 * @throws SQLException
 	 */
-	public void validateReadable(Connection conn, int docId, int roleId) throws SQLException {
+	public void validate(Connection conn, int docId, int roleId) throws SQLException {
 		UserRole role = UserRole.valueOf(roleDao.getNameById(conn, roleId));
 
 		if (role == UserRole.ADMIN) {
@@ -36,7 +38,7 @@ public class DocPermissionService {
 		}
 
 		if (whitelistDao.existsByDocumentIdAndRoleId(conn, docId, roleId) == false) {
-			throw new IllegalArgumentException("해당 문서에 대한 열람 권한이 없습니다.");
+			throw new SystemException(DocError.NOT_AUTHORIZED);
 		}
 	}
 }

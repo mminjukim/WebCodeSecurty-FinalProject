@@ -1,6 +1,8 @@
 package main.application.session;
 
+import main.common.exception.SystemException;
 import main.user.dto.UserDto;
+import main.user.exception.UserError;
 
 /**
  * 로그인한 사용자를 관리
@@ -23,7 +25,7 @@ public class Session {
 
 	public UserDto getCurrentUser() {
 		if (currentUser == null) {
-			throw new IllegalStateException("로그인된 사용자가 없습니다.");
+			throw new SystemException(UserError.NO_LOGIN_USER);
 		}
 		return currentUser;
 	}

@@ -7,9 +7,12 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import main.common.exception.SystemException;
 import main.document.dto.DocumentSummaryDto;
+import main.document.exception.DocError;
 import main.document.service.DocService;
 import main.user.domain.UserRole;
+import main.user.exception.UserError;
 
 public class DocController {
 
@@ -27,38 +30,32 @@ public class DocController {
 	public void uploadDocument() {
 		System.out.println("\n---------Upload Document----------");
 
-		try {
-			System.out.print("1. 업로드할 문서의 경로를 입력하세요: ");
-			String filePath = scanner.nextLine();
+		System.out.print("1. 업로드할 문서의 경로를 입력하세요: ");
+		String filePath = scanner.nextLine();
 
-			// 빈 문자열 체크
-			if (filePath == null || filePath.trim().isEmpty()) {
-				throw new IllegalArgumentException("파일명을 입력해주세요.");
-			}
-
-			// 파일 존재 유무 우선적 확인
-			try (FileInputStream fis = new FileInputStream(filePath)) {
-			} catch (IOException e) {
-				throw new IllegalArgumentException("업로드할 문서를 찾을 수 없습니다.");
-			}
-
-			System.out.println("2. 열람 권한을 허용할 역할의 번호들을 입력하세요. [ " + UserRole.getNumberAndKorName() + " ]");
-			System.out.print("   (예시: 1, 2, 3 또는 1 2 3) : ");
-			String inputWhitelist = scanner.nextLine();
-			List<UserRole> whitelist = parseRoles(inputWhitelist);
-			whitelist.add(UserRole.ADMIN);
-
-			System.out.println("[알림] 문서 암호화 및 업로드를 시작합니다...");
-			docService.upload(filePath, whitelist);
-			System.out.println("[알림] 문서가 성공적으로 업로드되었습니다.");
-
-			System.out.println("----------------------------------\n");
-
-		} catch (IllegalArgumentException | IllegalStateException e) {
-			System.out.println("\n[오류] " + e.getMessage());
+		// 빈 문자열 체크
+		if (filePath == null || filePath.trim().isEmpty()) {
+			throw new IllegalArgumentException("파일명을 입력해주세요.");
 		}
-	}
 
+		// 파일 존재 유무 우선적 확인
+		try (FileInputStream fis = new FileInputStream(filePath)) {
+		} catch (IOException e) {
+			throw new SystemException(DocError.DOCUMENT_NOT_FOUND);
+		}
+
+		System.out.println("2. 열람 권한을 허용할 역할의 번호들을 입력하세요. [ " + UserRole.getNumberAndKorName() + " ]");
+		System.out.print("   (예시: 1, 2, 3 또는 1 2 3) : ");
+		String inputWhitelist = scanner.nextLine();
+		List<UserRole> whitelist = parseRoles(inputWhitelist);
+		whitelist.add(UserRole.ADMIN);
+
+		System.out.println("[알림] 문서 암호화 및 업로드를 시작합니다...");
+		docService.upload(filePath, whitelist);
+		System.out.println("[알림] 문서가 성공적으로 업로드되었습니다.");
+
+		System.out.println("----------------------------------\n");
+	}
 
 	/**
 	 * 문서 열람
@@ -83,14 +80,12 @@ public class DocController {
 			System.out.print("\n열람할 문서의 번호를 입력하세요: ");
 			String docInput = scanner.nextLine();
 			if (docInput == null || docInput.trim().isEmpty()) {
-				System.out.println("[오류] 문서의 번호를 입력하세요.");
-				return;
+				throw new SystemException(DocError.INVALID_DOC_NO, "빈 값 입력됨");
 			}
 
 			int docId = Integer.parseInt(docInput);
 			if (docId <= 0 || docId > documents.size()) {
-				System.out.println("[오류] 올바른 문서의 번호를 입력하세요.");
-				return;
+				throw new SystemException(DocError.INVALID_DOC_NO);
 			}
 
 			//해당하는 번호의 문서가 없을때
@@ -98,7 +93,7 @@ public class DocController {
 					.map(DocumentSummaryDto::getId)
 					.toList();
 			if (ids.contains(docId) == false) {
-				throw new IllegalArgumentException("해당 번호의 문서가 존재하지 않습니다.");
+				throw new SystemException(DocError.DOCUMENT_NOT_FOUND);
 			}
 
 			System.out.println("[알림] 문서 복호화를 시작합니다...");
@@ -110,9 +105,7 @@ public class DocController {
 			System.out.println("\n==================================\n");
 
 		} catch (NumberFormatException e) {
-			System.out.println("[오류] 열람할 문서의 번호를 입력해야 합니다.");
-		}  catch (IllegalArgumentException | IllegalStateException e) {
-			System.out.println("\n[오류] " + e.getMessage());
+			throw new SystemException(DocError.INVALID_DOC_NO, "숫자만 입력");
 		}
 	}
 
@@ -121,10 +114,10 @@ public class DocController {
 	 */
 	private List<UserRole> parseRoles(String input) throws IllegalArgumentException {
 		if (input == null || input.trim().isEmpty()) {
-			throw new IllegalArgumentException("열람 허용할 역할을 입력해야 합니다.");
+			throw new SystemException(UserError.INVALID_ROLE_NO, "빈 값 입력됨");
 		}
 		if (input.matches("^[0-9, ]+$") == false) {
-			throw new IllegalArgumentException("숫자, 콤마, 공백만 입력 가능합니다. 잘못된 입력값: " + input);
+			throw new SystemException(UserError.INVALID_ROLE_NO, "숫자, 콤마, 공백만 입력 가능");
 		}
 		return Arrays.stream(input.split("[, ]+"))
 				.filter(token -> token.isEmpty() == false)

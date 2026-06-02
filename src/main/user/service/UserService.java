@@ -1,18 +1,20 @@
 package main.user.service;
 
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
 import main.application.database.DBManager;
 import main.application.initializer.KeyInitializer;
+import main.common.exception.Error;
+import main.common.exception.SystemException;
+import main.common.util.PasswordHasher;
 import main.user.dao.RoleDao;
 import main.user.dao.UserDao;
 import main.user.domain.UserRole;
 import main.user.dto.SignupRequestDto;
 import main.user.dto.UserDto;
-import main.util.PasswordHasher;
+import main.user.exception.UserError;
 
 public class UserService {
 
@@ -27,10 +29,10 @@ public class UserService {
 	/**
 	 * 회원가입
 	 */
-	public void signup(SignupRequestDto request) throws NoSuchAlgorithmException {
+	public void signup(SignupRequestDto request) {
 		try (Connection conn = DBManager.getConnection()) {
 			if (userDao.isUsernameExist(conn, request.getUsername())) {
-				throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+				throw new SystemException(UserError.USER_ALREADY_EXISTS);
 			}
 
 			UserRole role = UserRole.fromRoleNo(request.getRoleNo());
@@ -45,32 +47,31 @@ public class UserService {
 
 			int result = userDao.insertUser(conn, newUser);
 			if (result == 0) {
-				throw new IllegalStateException("회원가입 데이터베이스 삽입에 실패했습니다.");
+				throw new SystemException(Error.DATABASE_ERROR, "사용자를 저장할 수 없음");
 			}
 		} catch (SQLException e) {
-			throw new IllegalStateException("데이터베이스 연결 오류가 발생했습니다.");
+			throw new SystemException(Error.DATABASE_ERROR, "회원가입 처리 중 오류");
 		}
 	}
 
 	/**
 	 * 로그인
 	 */
-	public UserDto login(String username, char[] password) throws NoSuchAlgorithmException {
+	public UserDto login(String username, char[] password) {
 		try (Connection conn = DBManager.getConnection()) {
 			UserDto user = userDao.getUserByUsername(conn, username);
 
 			if (user == null) {
-				throw new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다.");
+				throw new SystemException(UserError.NOT_AUTHENTICATED);
 			}
-
 			if (PasswordHasher.verify(password, user.getPassword()) == false) {
-				throw new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다.");
+				throw new SystemException(UserError.NOT_AUTHENTICATED);
 			}
 
 			return user;
 
 		} catch (SQLException e) {
-			throw new IllegalStateException("데이터베이스 연결 오류가 발생했습니다.");
+			throw new SystemException(Error.DATABASE_ERROR, "로그인 정보 조회 중 오류");
 		}
 	}
 
@@ -83,7 +84,7 @@ public class UserService {
 			return UserRole.valueOf(roleName);
 
 		} catch (SQLException e) {
-			throw new IllegalStateException("데이터베이스 연결 오류가 발생했습니다.");
+			throw new SystemException(Error.DATABASE_ERROR, "역할 정보 조회 중 오류");
 		}
 	}
 
@@ -96,7 +97,7 @@ public class UserService {
 			List<UserDto> users = userDao.getAllUsers(conn, adminRoleId);
 			return users;
 		} catch (SQLException e) {
-			throw new IllegalStateException("사용자 리스트를 불러오는 중 오류가 발생했습니다.");
+			throw new SystemException(Error.DATABASE_ERROR, "사용자 리스트 조회 중 오류");
 		}
 	}
 
@@ -107,12 +108,12 @@ public class UserService {
 		try (Connection conn = DBManager.getConnection()) {
 			int roleId = roleDao.getRoleId(conn, UserRole.fromRoleNo(roleNo));
 			if (user.getRoleId() == roleId) {
-				throw new IllegalArgumentException("변경하려는 역할이 기존과 동일합니다.");
+				throw new SystemException(UserError.CANNOT_CHANGE_ROLE);
 			}
 			userDao.updateRoleId(conn, user.getId(), roleId);
 
 		} catch (SQLException e) {
-			throw new IllegalStateException("데이터베이스 연결 오류가 발생했습니다.");
+			throw new SystemException(Error.DATABASE_ERROR, "역할 변경 중 오류");
 		}
 	}
 

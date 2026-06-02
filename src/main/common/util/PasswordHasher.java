@@ -1,10 +1,13 @@
-package main.util;
+package main.common.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
+
+import main.common.exception.Error;
+import main.common.exception.SystemException;
 
 public class PasswordHasher {
 
@@ -47,7 +50,7 @@ public class PasswordHasher {
 			return ITERATIONS + ":" + encodedSalt + ":" + encodedHash;
 
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("해싱 알고리즘을 초기화할 수 없습니다.");
+			throw new SystemException(Error.HASH_ERROR);
 
 		} finally {
 			if (passwordBytes != null) {

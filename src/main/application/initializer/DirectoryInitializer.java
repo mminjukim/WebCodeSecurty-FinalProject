@@ -24,7 +24,7 @@ public class DirectoryInitializer {
 			} catch (FileAlreadyExistsException e) {
 				continue;
 			} catch (IOException e) {
-				System.out.println("[오류] 초기 키 디렉토리 구성에 실패했습니다:" + path);
+				System.out.println("키 디렉토리 구성 실패");
 				System.exit(1);
 			}
 		}
@@ -41,7 +41,7 @@ public class DirectoryInitializer {
 			} catch (FileAlreadyExistsException e) {
 				continue;
 			} catch (IOException e) {
-				System.out.println("[오류] 초기 문서 디렉토리 구성에 실패했습니다:" + path);
+				System.out.println("문서 디렉토리 구성 실패");
 				System.exit(1);
 			}
 		}

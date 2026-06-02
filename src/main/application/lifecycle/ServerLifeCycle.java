@@ -10,7 +10,7 @@ public class ServerLifeCycle {
 	}
 
 	public static final void start() {
-		DataInitializer.dropAllTables(); // 필요에 따라 주석 처리
+//		DataInitializer.dropAllTables(); // 필요에 따라 주석 처리
 
 		DataInitializer.createTables();
 		DirectoryInitializer.makeKeyDir();

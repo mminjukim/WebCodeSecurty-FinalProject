@@ -5,8 +5,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import main.application.database.DBManager;
-import main.util.QueryExecutor;
-import main.util.SqlQueryBuilder;
+import main.common.exception.Error;
+import main.common.exception.SystemException;
+import main.common.util.QueryExecutor;
+import main.common.util.SqlQueryBuilder;
 
 /**
  * 데이터 초기화
@@ -80,7 +82,7 @@ public class DataInitializer {
 			stmt.executeUpdate(createWhitelists);
 			stmt.executeUpdate(createReadLogs);
 		} catch (SQLException e) {
-			throw new IllegalStateException("데이터베이스 테이블 생성 중 오류가 발생했습니다.", e);
+			throw new SystemException(Error.DATABASE_ERROR, "테이블 초기화 실패");
 		}
 	}
 
@@ -100,7 +102,7 @@ public class DataInitializer {
 				KeyInitializer.initializeRoleKeys();
 			}
 		} catch (SQLException e) {
-			throw new IllegalStateException("역할 데이터 초기화 중 오류가 발생했습니다.", e);
+			throw new SystemException(Error.DATABASE_ERROR, "역할 데이터 초기화 실패");
 		}
 	}
 
@@ -115,7 +117,7 @@ public class DataInitializer {
 			stmt.executeUpdate("drop table if exists users;");
 			stmt.executeUpdate("drop table if exists roles;");
 		} catch (SQLException e) {
-			throw new IllegalStateException("데이터베이스 테이블 삭제에 실패했습니다.", e);
+			throw new SystemException(Error.DATABASE_ERROR, "테이블 삭제 실패");
 		}
 	}
 }

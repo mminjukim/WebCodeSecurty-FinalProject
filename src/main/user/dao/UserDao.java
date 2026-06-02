@@ -6,9 +6,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import main.common.exception.SystemException;
+import main.common.util.QueryExecutor;
+import main.common.util.SqlQueryBuilder;
 import main.user.dto.UserDto;
-import main.util.QueryExecutor;
-import main.util.SqlQueryBuilder;
+import main.user.exception.UserError;
 
 public class UserDao {
 
@@ -69,7 +71,7 @@ public class UserDao {
 			if (rs.next()) {
 	            return rs.getString(COL_PUBLIC_KEY);
 	        }
-	        throw new IllegalArgumentException("해당 ID의 사용자 정보를 찾을 수 없습니다: " + id);
+			throw new SystemException(UserError.USER_NOT_FOUND);
 		});
 	}
 	
@@ -82,7 +84,7 @@ public class UserDao {
 			if (rs.next()) {
 	            return rs.getString(COL_PRIVATE_KEY);
 	        }
-	        throw new IllegalArgumentException("해당 ID의 사용자 정보를 찾을 수 없습니다: " + id);
+			throw new SystemException(UserError.USER_NOT_FOUND);
 		});
 	}
 	
@@ -95,7 +97,7 @@ public class UserDao {
 			if (rs.next()) {
 	            return rs.getString(COL_USERNAME);
 	        }
-	        throw new IllegalArgumentException("해당 ID의 사용자 정보를 찾을 수 없습니다: " + id);
+			throw new SystemException(UserError.USER_NOT_FOUND);
 		});
 	}
 

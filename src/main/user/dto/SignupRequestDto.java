@@ -2,6 +2,9 @@ package main.user.dto;
 
 import java.util.Arrays;
 
+import main.common.exception.SystemException;
+import main.user.exception.UserError;
+
 public class SignupRequestDto {
 	private final String username;
 	private final char[] password;
@@ -9,13 +12,13 @@ public class SignupRequestDto {
 
 	public SignupRequestDto(String username, char[] password, char[] confirmPassword, int roleNo) {
 		if (username == null || username.trim().isEmpty()) {
-			throw new IllegalArgumentException("아이디는 필수 입력값입니다.");
+			throw new SystemException(UserError.INVALID_INPUT, "아이디 입력 필요");
 		}
 		if (password == null || password.length == 0) {
-			throw new IllegalArgumentException("비밀번호는 필수 입력값입니다.");
+			throw new SystemException(UserError.INVALID_INPUT, "비밀번호 입력 필요");
 		}
 		if (Arrays.equals(password, confirmPassword) == false) {
-			throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+			throw new SystemException(UserError.INVALID_INPUT, "비밀번호가 일치하지 않음");
 		}
 
 		this.username = username;

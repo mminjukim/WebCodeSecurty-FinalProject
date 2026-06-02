@@ -3,7 +3,9 @@ package main.log.controller;
 import java.util.List;
 import java.util.Scanner;
 
+import main.common.exception.SystemException;
 import main.document.dto.DocumentSummaryDto;
+import main.document.exception.DocError;
 import main.document.service.DocService;
 import main.log.service.ReadLogService;
 
@@ -41,14 +43,12 @@ public class ReadLogController {
 			System.out.print("\n로그를 확인할 문서의 번호를 입력하세요 : ");	
 			String docInput = scanner.nextLine();
 			if (docInput == null || docInput.trim().isEmpty()) {
-				System.out.println("[오류] 문서의 번호를 입력하세요.");
-				return;
+				throw new SystemException(DocError.INVALID_DOC_NO, "빈 값 입력됨");
 			}
 
 			int docId = Integer.parseInt(docInput);
 			if (docId <= 0 || docId > documents.size()) {
-				System.out.println("[오류] 올바른 문서의 번호를 입력하세요.");
-				return;
+				throw new SystemException(DocError.INVALID_DOC_NO);
 			}
 
 			//문서 존재 유무 확인
@@ -56,11 +56,15 @@ public class ReadLogController {
 					.map(DocumentSummaryDto::getId)
 					.toList();
 			if (!ids.contains(docId)) {
-				throw new IllegalArgumentException("해당 번호의 문서가 존재하지 않습니다.");
+				throw new SystemException(DocError.DOCUMENT_NOT_FOUND);
 			}
 
 			System.out.println("[알림] 문서 로그 검증 및 출력을 시작합니다...");
 			String result = readLogService.viewLogs(docId);
+
+			if (result == null) {
+				return;
+			}
 
 			System.out.println("[알림] 로그 검증을 성공했습니다.");
 			System.out.println("\n================LOG===============\n");
@@ -68,9 +72,7 @@ public class ReadLogController {
 			System.out.println("==================================\n");
 
 		} catch (NumberFormatException e) {
-			System.out.println("[오류] 숫자를 입력하세요.");
-		} catch (Exception e) {
-			System.out.println("[오류] " + e.getMessage());
+			throw new SystemException(DocError.INVALID_DOC_NO, "숫자만 입력");
 		}
 	}
 }

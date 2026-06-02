@@ -3,6 +3,8 @@ package main.log.service;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import main.common.exception.Error;
+import main.common.exception.SystemException;
 import main.log.dto.ReadLogDto;
 import main.user.dao.UserDao;
 
@@ -30,7 +32,7 @@ public class ReadLogFormatter {
 			return log.getReadAt() + " READ: user=" + username + ",\trole=" + log.getReaderRole() + ",\tstatus="
 					+ log.getStatus() + ",\tfail=" + log.getFailReason();
 		} catch (SQLException e) {
-			throw new IllegalStateException("로그 열람한 사용자 정보를 조회 중 오류가 발생했습니다.");
+			throw new SystemException(Error.DATABASE_ERROR, "열람자 정보 조회 중 오류");
 		}
 	}
 }

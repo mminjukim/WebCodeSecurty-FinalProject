@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import main.application.database.DBManager;
+import main.common.exception.Error;
+import main.common.exception.SystemException;
 import main.document.dao.DocumentDao;
 import main.document.dto.DocumentSummaryDto;
 import main.user.domain.UserRole;
@@ -54,7 +56,7 @@ public class DocService {
 		try (Connection conn = DBManager.getConnection()) {
 			return documentDao.getAllDocumentSummaries(conn);
 		} catch (SQLException e) {
-			throw new IllegalStateException("전체 문서 목록 조회 중 오류가 발생했습니다.");
+			throw new SystemException(Error.DATABASE_ERROR, "전체 문서 조회 오류");
 		}
 	}
 

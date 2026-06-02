@@ -1,14 +1,16 @@
 package main.user.controller;
 
 import java.io.Console;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Scanner;
 
 import main.application.session.Session;
+import main.common.exception.Error;
+import main.common.exception.SystemException;
 import main.user.domain.UserRole;
 import main.user.dto.SignupRequestDto;
 import main.user.dto.UserDto;
+import main.user.exception.UserError;
 import main.user.service.UserService;
 
 public class UserController {
@@ -28,8 +30,7 @@ public class UserController {
 	 */
 	public void processSignup() {
 		if (console == null) {
-			System.out.println("\n[오류] 콘솔이 지원되지 않는 환경입니다.");
-			return;
+			throw new SystemException(Error.INTERNAL_ERROR, "현재 환경에서 콘솔이 지원되지 않음");
 		}
 
 		System.out.println("\n--------------SignUp--------------");
@@ -38,28 +39,24 @@ public class UserController {
 		String username = scanner.nextLine();
 
 		if (username == null || username.trim().isEmpty()) {
-			System.out.println("[오류] 아이디는 필수로 입력해야 합니다.");
-			return;
+			throw new SystemException(UserError.INVALID_INPUT, "빈 아이디 입력됨");
 		}
 
 		System.out.print("2. 역할을 입력하세요 (숫자만 입력. " + UserRole.getNumberAndKorName() + "): ");
 		String roleInput = scanner.nextLine();
 
 		if (roleInput == null || roleInput.trim().isEmpty()) {
-			System.out.println("[오류] 역할은 필수로 입력해야 합니다.");
-			return;
+			throw new SystemException(UserError.INVALID_ROLE_NO, "빈 역할 입력됨");
 		}
 
 		char[] password = console.readPassword("3. 비밀번호를 입력하세요: ");
 		if (password == null || password.length == 0) {
-			System.out.println("[오류] 비밀번호는 필수로 입력해야 합니다.");
-			return;
+			throw new SystemException(UserError.INVALID_INPUT, "빈 비밀번호 입력됨");
 		}
 
 		char[] confirmPassword = console.readPassword("4. 비밀번호를 다시 입력하세요: ");
 		if (confirmPassword == null || confirmPassword.length == 0) {
-			System.out.println("[오류] 비밀번호는 필수로 입력해야 합니다.");
-			return;
+			throw new SystemException(UserError.INVALID_INPUT, "빈 비밀번호 입력됨");
 		}
 
 		System.out.println("----------------------------------\n");
@@ -67,16 +64,14 @@ public class UserController {
 		try {
 			int roleNo = Integer.parseInt(roleInput.trim());
 			if (roleNo == 0) {
-				throw new IllegalArgumentException("유효하지 않은 역할 번호입니다.");
+				throw new SystemException(UserError.INVALID_ROLE_NO);
 			}
 			SignupRequestDto requestDto = new SignupRequestDto(username, password, confirmPassword, roleNo);
 			userService.signup(requestDto);
 			System.out.println("::: 회원가입 완료 ::: \n" + username + "님 환영합니다.");
 
 		} catch (NumberFormatException e) {
-			System.out.println("[오류] 역할은 숫자로 입력해야 합니다.");
-		} catch (Exception e) {
-			System.out.println("[오류] " + e.getMessage());
+			throw new SystemException(UserError.INVALID_ROLE_NO, "숫자만 입력");
 		}
 	}
 
@@ -85,8 +80,7 @@ public class UserController {
 	 */
 	public UserDto processLogin() {
 		if (console == null) {
-			System.out.println("\n[오류] 콘솔이 지원되지 않는 환경입니다.");
-			return null;
+			throw new SystemException(Error.INTERNAL_ERROR, "현재 환경에서 콘솔이 지원되지 않음");
 		}
 
 		System.out.println("\n--------------Login---------------");
@@ -97,23 +91,13 @@ public class UserController {
 		System.out.println("----------------------------------\n");
 
 		if ((username == null || username.trim().isEmpty()) || (password == null || password.length == 0)) {
-			System.out.println("[오류] 아이디와 비밀번호는 필수로 입력해야 합니다.");
-			return null;
+			throw new SystemException(UserError.INVALID_INPUT);
 		}
 
-		try {
-			UserDto loginUser = userService.login(username, password);
-			System.out.println("::: 로그인 완료 ::: \n" + loginUser.getUsername() + "님 환영합니다.");
-			return loginUser;
+		UserDto loginUser = userService.login(username, password);
 
-		} catch (IllegalArgumentException e) {
-			System.out.println("[오류] " + e.getMessage());
-		} catch (IllegalStateException e) {
-			System.out.println("[오류] " + e.getMessage());
-		} catch (NoSuchAlgorithmException e) {
-			System.out.println("[오류] " + e.getMessage());
-		}
-		return null;
+		System.out.println("::: 로그인 완료 ::: \n" + loginUser.getUsername() + "님 환영합니다.");
+		return loginUser;
 	}
 
 	/**
@@ -144,15 +128,13 @@ public class UserController {
 		System.out.print("\n1. 역할을 변경할 사용자를 선택해주세요 ([번호] 입력): ");
 		String strInput = scanner.nextLine();
 		if (strInput == null || strInput.trim().isEmpty()) {
-			System.out.println("[오류] 사용자 번호를 입력하세요.");
-			return;
+			throw new SystemException(UserError.INVALID_INPUT, "빈 값 입력됨");
 		}
 
 		try {
 			int userIdx = Integer.parseInt(strInput) - 1;
 			if (userIdx < 0 || userIdx >= allUsers.size()) {
-				System.out.println("[오류] 올바른 사용자 번호를 입력하세요.");
-				return;
+				throw new SystemException(UserError.INVALID_INPUT);
 			}
 
 			UserDto user = allUsers.get(userIdx);
@@ -160,13 +142,11 @@ public class UserController {
 			System.out.print("2. 새로 부여할 역할을 입력하세요 (숫자만 입력. " + UserRole.getNumberAndKorName() + "): ");
 			String roleInput = scanner.nextLine();
 			if (roleInput == null || roleInput.trim().isEmpty()) {
-				System.out.println("[오류] 역할은 필수로 입력해야 합니다.");
-				return;
+				throw new SystemException(UserError.INVALID_ROLE_NO, "빈 값 입력됨");
 			}
 			int roleNo = Integer.parseInt(roleInput);
 			if (roleNo == 0) {
-				System.out.println("[오류] 유효하지 않은 역할 번호입니다.");
-				return;
+				throw new SystemException(UserError.INVALID_ROLE_NO);
 			}
 
 			userService.changeUserRole(user, roleNo);
@@ -175,9 +155,7 @@ public class UserController {
 					+ UserRole.fromRoleNo(roleNo).getKorName() + "\n");
 
 		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("역할은 숫자로 입력해야 합니다.");
-		} catch (IllegalArgumentException e) {
-			System.out.println("[오류] " + e.getMessage());
+			throw new SystemException(UserError.INVALID_ROLE_NO, "숫자만 입력");
 		}
 
 		System.out.println("----------------------------------\n");

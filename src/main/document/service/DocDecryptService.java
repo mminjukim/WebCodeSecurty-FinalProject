@@ -11,6 +11,10 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
+import main.common.exception.Error;
+import main.common.exception.SystemException;
+import main.document.exception.DocError;
+
 public class DocDecryptService {
 
 	private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
@@ -28,6 +32,7 @@ public class DocDecryptService {
 		try (FileInputStream fis = new FileInputStream(inputFilePath);
 				BufferedInputStream bis = new BufferedInputStream(fis);
 				ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+
 			// 초기화 벡터 추출
 			byte[] iv = new byte[IV_LENGTH];
 			int ivBytesRead = bis.read(iv);
@@ -35,7 +40,7 @@ public class DocDecryptService {
 
 			// 파일 크기 검증
 			if (ivBytesRead != IV_LENGTH) {
-				throw new IllegalArgumentException("올바른 암호화 문서가 아닙니다.");
+				throw new SystemException(DocError.WRONGLY_ENCRYPTED_DOC);
 			}
 
 			// cipher 객체 생성 및 초기화
@@ -62,27 +67,28 @@ public class DocDecryptService {
 
 			//문자열로 반환
 			return bos.toString(StandardCharsets.UTF_8);
+
 		} catch (FileNotFoundException e) {
-			throw new IllegalArgumentException("해당 파일을 찾을 수 없습니다.");
+			throw new SystemException(DocError.DOCUMENT_NOT_FOUND);
 		} catch (IOException e) {
-			throw new IllegalStateException("파일 처리에 실패했습니다.");
+			throw new SystemException(Error.FILE_PROCESS_ERROR, "암호화 문서 파일 처리 실패");
 		} catch (Exception e) {
-			throw new IllegalStateException("파일 복호화에 실패했습니다.");
+			throw new SystemException(DocError.DOCUMENT_DECRYPTION_FAILED);
 		}
 	}
 
 	/**
 	 * 문서의 암호화된 전자서명을 비밀 키로 복호화
 	 * 
-	 * @param encryptedSignature		암호화된전자서명
-	 * @param secretKey				비밀 키
+	 * @param encryptedSignature 암호화된전자서명
+	 * @param secretKey          비밀 키
 	 * @return 복호화된 전자서명
 	 */
 	public byte[] decryptSignature(byte[] encryptedSignature, SecretKey secretKey) {
 		try {
-			// 입력값  검증
+			// 입력값 검증
 			if (encryptedSignature == null || encryptedSignature.length < IV_LENGTH) {
-				throw new IllegalArgumentException("올바른 암호화된 전자서명이 아닙니다.");
+				throw new SystemException(DocError.WRONGLY_ENCRYPTED_SIG);
 			}
 
 			// 초기화 벡터 추출
@@ -103,7 +109,7 @@ public class DocDecryptService {
 			return cipher.doFinal(encryptedData);
 
 		} catch (Exception e) {
-			throw new IllegalStateException("전자서명 복호화 중 오류가 발생했습니다.");
+			throw new SystemException(DocError.SIGNATURE_DECRYPTION_FAILED);
 		}
 	}
 

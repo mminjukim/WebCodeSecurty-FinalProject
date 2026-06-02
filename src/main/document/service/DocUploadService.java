@@ -1,9 +1,11 @@
 package main.document.service;
 
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.crypto.KeyGenerator;
@@ -14,6 +16,8 @@ import main.application.key.KeyFileService;
 import main.application.key.KeyFileService.KeyDomain;
 import main.application.key.KeyFileService.KeyType;
 import main.application.session.Session;
+import main.common.exception.Error;
+import main.common.exception.SystemException;
 import main.document.dao.DocumentDao;
 import main.document.dao.WhitelistDao;
 import main.document.dto.DocumentDto;
@@ -108,8 +112,10 @@ public class DocUploadService {
 
 			return docId;
 
-		} catch (Exception e) {
-			throw new IllegalStateException("문서 업로드 중 오류가 발생했습니다.", e);
+		} catch (SQLException e) {
+			throw new SystemException(Error.DATABASE_ERROR);
+		} catch (NoSuchAlgorithmException e) {
+			throw new SystemException(Error.KEY_GENERATE_ERROR, "문서 암호화 키");
 		}
 	}
 

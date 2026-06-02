@@ -10,6 +10,9 @@ import java.security.PublicKey;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
+import main.common.exception.SystemException;
+import main.document.exception.DocError;
+
 public class EnvelopeService {
 
 	private static final String TRANSFORMATION = "RSA/ECB/PKCS1Padding";
@@ -30,7 +33,7 @@ public class EnvelopeService {
 				bos.flush();
 			}
 		} catch (Exception e) {
-			throw new IllegalStateException("문서의 전자봉투 생성 중 오류가 발생했습니다.");
+			throw new SystemException(DocError.ENVELOPE_ERROR, "생성 중 오류");
 		}
 	}
 
@@ -49,8 +52,9 @@ public class EnvelopeService {
 
 			// SecretKey 복호화 후 반환
 			return (SecretKey)cipher.unwrap(encryptedKeyBytes, keyAlgorithm, Cipher.SECRET_KEY);
+
 		} catch (Exception e) {
-			throw new IllegalStateException("문서의 전자봉투 개봉 중 오류가 발생했습니다.");
+			throw new SystemException(DocError.ENVELOPE_ERROR, "개봉 중 오류");
 		}
 	}
 }

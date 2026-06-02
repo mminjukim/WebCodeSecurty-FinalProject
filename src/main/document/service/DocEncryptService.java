@@ -12,6 +12,10 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
+import main.common.exception.Error;
+import main.common.exception.SystemException;
+import main.document.exception.DocError;
+
 public class DocEncryptService {
 
 	private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
@@ -63,13 +67,15 @@ public class DocEncryptService {
 				}
 
 				bos.flush();
+
 			} catch (FileNotFoundException e) {
-				throw new IllegalArgumentException("해당 파일을 찾을 수 없습니다.");
+				throw new SystemException(DocError.DOCUMENT_NOT_FOUND);
+
 			} catch (IOException e) {
-				throw new IllegalStateException("파일 처리에 실패했습니다.");
+				throw new SystemException(Error.FILE_PROCESS_ERROR);
 			}
 		} catch (Exception e) {
-			throw new IllegalStateException("파일 암호화에 실패했습니다.");
+			throw new SystemException(DocError.DOCUMENT_ENCRYPTION_FAILED);
 		}
 	}
 
@@ -102,7 +108,7 @@ public class DocEncryptService {
 			return result;
 
 		} catch (Exception e) {
-			throw new IllegalStateException("전자서명 암호화 중 오류가 발생했습니다.");
+			throw new SystemException(DocError.SIGNATURE_ENCRYPTION_FAILED);
 		}
 	}
 }

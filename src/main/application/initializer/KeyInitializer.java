@@ -12,10 +12,12 @@ import main.application.database.DBManager;
 import main.application.key.KeyFileService;
 import main.application.key.KeyFileService.KeyDomain;
 import main.application.key.KeyFileService.KeyType;
+import main.common.exception.Error;
+import main.common.exception.SystemException;
+import main.common.util.QueryExecutor;
+import main.common.util.SqlQueryBuilder;
 import main.user.domain.UserRole;
 import main.user.dto.UserDto;
-import main.util.QueryExecutor;
-import main.util.SqlQueryBuilder;
 
 /**
  * 키 초기화
@@ -27,8 +29,8 @@ public class KeyInitializer {
 		try {
 			keyPairGen = KeyPairGenerator.getInstance("RSA");
 		} catch (NoSuchAlgorithmException e) {
-			System.out.println("[오류] 역할 키 생성 중 오류 발생");
-			return;
+			System.out.println("역할 대칭 키 초기화 실패");
+			System.exit(1);
 		}
 		keyPairGen.initialize(2048);
 		
@@ -60,7 +62,8 @@ public class KeyInitializer {
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println("역할 대칭 키 초기화 실패");
+			System.exit(1);
 		}
 	}
 
@@ -69,8 +72,7 @@ public class KeyInitializer {
 		try {
 			keyPairGen = KeyPairGenerator.getInstance("RSA");
 		} catch (NoSuchAlgorithmException e) {
-			System.out.println("[오류] 사용자 키 생성 중 오류 발생");
-			return user;
+			throw new SystemException(Error.KEY_GENERATE_ERROR);
 		}
 		keyPairGen.initialize(2048);
 
