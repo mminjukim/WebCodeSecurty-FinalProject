@@ -106,7 +106,7 @@ public class ReadLogService {
 					+ failReason.name() + "|" + readAt;
 
 			// 현재 사용자의 개인 키 불러오기
-			PrivateKey privateKey = (PrivateKey) KeyFileService.read(userDao.getPrivateKeyPathById(conn, userId));
+			PrivateKey privateKey = KeyFileService.readPrivateKey(userDao.getPrivateKeyPathById(conn, userId));
 
 			// 열람자(현재 사용자) 개인 키로 로그 전자서명 생성
 			byte[] signature = integrityService.sign(dataToSign, privateKey);

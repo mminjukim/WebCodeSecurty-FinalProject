@@ -50,7 +50,7 @@ public class KeyInitializer {
 				);
 				
 				KeyFileService.write(publicKeyPath, publicKey);
-				KeyFileService.write(privateKeyPath, privateKey);
+				KeyFileService.writePrivateKey(privateKeyPath, privateKey);
 
 				SqlQueryBuilder query = new SqlQueryBuilder()
 						.insertInto("roles")
@@ -88,7 +88,7 @@ public class KeyInitializer {
 		);
 
 		KeyFileService.write(publicKeyPath, publicKey);
-		KeyFileService.write(privateKeyPath, privateKey);
+		KeyFileService.writePrivateKey(privateKeyPath, privateKey);
 
 		user.setPublicKey(publicKeyPath);
 		user.setPrivateKey(privateKeyPath);

@@ -78,8 +78,8 @@ public class DocReadService {
 
 			// 역할 개인 키 불러오기
 			UserRole role = UserRole.valueOf(roleDao.getNameById(conn, roleId));
-			PrivateKey rolePrivateKey = (PrivateKey) KeyFileService
-					.read(KeyFileService.buildKeyPath(KeyDomain.ROLE, KeyType.PRIVATE, role.name()));
+			PrivateKey rolePrivateKey = KeyFileService
+					.readPrivateKey(KeyFileService.buildKeyPath(KeyDomain.ROLE, KeyType.PRIVATE, role.name()));
 
 			// 역할 개인 키로 전자봉투 복호화해 비밀 키 반환
 			SecretKey secretKey = envelopeService.openEnvelope(

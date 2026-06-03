@@ -83,7 +83,7 @@ public class DocUploadService {
 
 			// 현재 사용자의 개인 키 불러오기
 			String privateKeyPath = userDao.getPrivateKeyPathById(conn, userId);
-			PrivateKey privateKey = (PrivateKey) KeyFileService.read(privateKeyPath);
+			PrivateKey privateKey = KeyFileService.readPrivateKey(privateKeyPath);
 
 			// 사용자 개인 키로 문서 전자서명 생성 후 비밀 키로 전자서명 암호화
 			byte[] encryptedSignature = encryptService
