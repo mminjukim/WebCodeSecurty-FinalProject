@@ -34,6 +34,7 @@
   - 역할 공개키 기반 전자봉투 생성
   - 역할 개인키 기반 전자봉투 개봉
   - 사용자/역할 RSA 키쌍 생성 및 파일 저장
+  - 마스터키를 통한 사용자 개인키, 역할 개인키 암호화(래핑)
 
   #### 4. 열람 로그 및 무결성 검증
 
@@ -105,10 +106,9 @@ cd WebCodeSecurty-FinalProject
 
 #### 프로젝트에 관리자 계정 정보 생성 
 
-프로젝트 디렉토리에 `.admin.txt` 파일 생성 및 관리자 권한으로 생성할 계정 정보 입력 
+프로젝트 디렉토리에 아래 예시와 같이 `.admin.txt` 파일 생성 및 관리자 권한으로 생성할 계정 정보 입력 
 
 ```bash
-# 예시 
 test_admin
 test_admin_password
 ```
@@ -150,7 +150,7 @@ test_admin_password
       |   |   `-- KeyInitializer.java                  # 역할/사용자 RSA 키쌍 생성
       |   |-- key/
       |   |   |-- KeyFileService.java                  # 키 파일 경로 생성, 저장, 로드
-      |   |   |-- MasterKeyManager.java				   # AES 마스터키 생성, 저장, 로드
+      |   |   |-- MasterKeyManager.java				  # AES 마스터키 생성, 저장, 로드
       |   |   `-- MasterKeyWrapper.java                # 마스터키 기반 개인키 래핑/언래핑
       |   |-- lifecycle/
       |   |   |-- AppConfig.java                       # DAO, Service, Controller 의존성 생성 및 연결
