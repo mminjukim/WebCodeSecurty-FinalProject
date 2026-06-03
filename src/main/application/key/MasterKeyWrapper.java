@@ -1,11 +1,10 @@
-package main.common.util;
+package main.application.key;
 
 
 import java.security.PrivateKey;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
-import main.application.key.MasterKeyManager;
 import main.common.exception.Error;
 import main.common.exception.SystemException;
 

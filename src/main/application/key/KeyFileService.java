@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Paths;
 import java.security.Key;
+import java.security.PrivateKey;
 
 import main.common.exception.Error;
 import main.common.exception.SystemException;
@@ -86,4 +87,35 @@ public class KeyFileService {
 			throw new SystemException(Error.KEY_PROCESS_ERROR, "저장 오류");
 		}
 	}
+
+	/**
+	 * 개인키 불러오기 (마스터키 언래핑)
+	 *
+	 * @param fname 개인키 파일명
+	 * @return 복원된 개인키
+	 */
+	public static PrivateKey readPrivateKey(String fname) {
+		try (FileInputStream fis = new FileInputStream(fname)) {
+			return MasterKeyWrapper.unwrapPrivateKey(fis.readAllBytes());
+		} catch (IOException e) {
+			throw new SystemException(Error.KEY_PROCESS_ERROR, "개인키 불러오기 오류");
+		}
+	}
+
+	/**
+	 * 개인키 저장 (마스터키 래핑)
+	 *
+	 * @param fname 저장할 파일명
+	 * @param privateKey 저장할 개인키
+	 */
+	public static void writePrivateKey(String fname, PrivateKey privateKey) {
+		byte[] wrappedKey = MasterKeyWrapper.wrapPrivateKey(privateKey);
+
+		try (FileOutputStream fos = new FileOutputStream(fname)) {
+			fos.write(wrappedKey);
+		} catch (IOException e) {
+			throw new SystemException(Error.KEY_PROCESS_ERROR, "개인키 저장 오류");
+		}
+	}
+
 }
