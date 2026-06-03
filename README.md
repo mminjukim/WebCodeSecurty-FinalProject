@@ -122,13 +122,13 @@ test_admin_password
 
     javac -d bin -cp "lib\*" @sources.txt
 
-    java -cp "bin;lib\*" main.java.DocSystem
+    java -cp "bin;lib\*" main.DocSystem
     ```
 - Mac OS
     ```bash
     javac -d bin -cp "lib/*" $(find src -name "*.java")
 
-    java -cp "bin:lib/*" main.java.DocSystem
+    java -cp "bin:lib/*" main.DocSystem
     ```
 
 <br>
@@ -150,7 +150,8 @@ test_admin_password
       |   |   `-- KeyInitializer.java                  # 역할/사용자 RSA 키쌍 생성
       |   |-- key/
       |   |   |-- KeyFileService.java                  # 키 파일 경로 생성, 저장, 로드
-      |   |   `-- MasterKeyManager.java                # AES 마스터키 생성, 저장, 로드
+      |   |   |-- MasterKeyManager.java				   # AES 마스터키 생성, 저장, 로드
+      |   |   `-- MasterKeyWrapper.java                # 마스터키 기반 개인키 래핑/언래핑
       |   |-- lifecycle/
       |   |   |-- AppConfig.java                       # DAO, Service, Controller 의존성 생성 및 연결
       |   |   `-- ServerLifeCycle.java                 # 프로그램 시작/종료 초기화 흐름 처리
@@ -164,7 +165,6 @@ test_admin_password
       |   |   |-- ExceptionHandler.java                # 전역 예외 메시지 출력 처리
       |   |   `-- SystemException.java                 # 에러 코드를 포함하는 커스텀 런타임 예외
       |   `-- util/
-      |       |-- MasterKeyCryptor.java                # 마스터키 기반 AES 암호화/복호화 유틸
       |       |-- PasswordHasher.java                  # salt 기반 비밀번호 해싱 및 검증
       |       |-- QueryExecutor.java                   # PreparedStatement 기반 SELECT/INSERT/UPDATE 실행
       |       `-- SqlQueryBuilder.java                 # SELECT, INSERT, UPDATE SQL 빌더
