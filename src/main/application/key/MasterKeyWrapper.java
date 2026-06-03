@@ -17,7 +17,7 @@ public class MasterKeyWrapper {
 	}
 	
 	private static SecretKey getMasterKey() {
-		return MasterKeyManager.getInstance().initializeMasterKey();
+		return MasterKeyManager.getInstance().getMasterKey();
 	}
 	
 	/**

@@ -19,7 +19,7 @@ public class MasterKeyManager {
 
 	private static final String MASTER_KEY_PATH = ".keys/master.key";
 	private static final String ALGORITHM = "AES";
-	private static int KEY_SIZE = 256;
+	private static final int KEY_SIZE = 256;
 
 	private MasterKeyManager() {
 	}
@@ -28,7 +28,7 @@ public class MasterKeyManager {
 		return instance;
 	}
 
-	public SecretKey initializeMasterKey() {
+	public SecretKey getMasterKey() {
 		if (Files.exists(Paths.get(MASTER_KEY_PATH))) {
 			return loadMasterKey();
 		}
