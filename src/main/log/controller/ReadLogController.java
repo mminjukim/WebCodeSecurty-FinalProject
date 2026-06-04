@@ -1,6 +1,7 @@
 package main.log.controller;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 import main.common.exception.SystemException;
@@ -60,15 +61,11 @@ public class ReadLogController {
 			}
 
 			System.out.println("[알림] 문서 로그 검증 및 출력을 시작합니다...");
-			String result = readLogService.viewLogs(docId);
-
-			if (result == null) {
-				return;
-			}
+			Optional<String> result = readLogService.viewLogs(docId);
 
 			System.out.println("[알림] 로그 검증을 성공했습니다.");
 			System.out.println("\n================LOG===============\n");
-			System.out.println(result);
+			System.out.println(result.orElse("(열람 기록 없음)"));
 			System.out.println("==================================\n");
 
 		} catch (NumberFormatException e) {
