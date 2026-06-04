@@ -2,7 +2,6 @@ package main.document.service;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -49,16 +48,17 @@ public class DocSignatureService {
 	/**
 	 * 전자서명을 작성자의 공개키로 검증
 	 * 
-	 * @param documentContent 원본 문서 내용 (문자열)
-	 * @param privateKey      작성자 개인 키
-	 * @return 문서 전자서명 값
+	 * @param documentContent 	검증할 문서 바이트 배열
+	 * @param signatureData		복호화된 전자서명
+	 * @param publicKey		 	작성자 공개 키
+	 * @return 전자서명 검증 결과
 	 */
-	public boolean verifySignature(String documentContent, byte[] signatureData, PublicKey publicKey) {
+	public boolean verifySignature(byte[] documentContent, byte[] signatureData, PublicKey publicKey) {
 		try {
 			Signature signature = Signature.getInstance(ALGORITHM);
 			signature.initVerify(publicKey);
 
-			signature.update(documentContent.getBytes(StandardCharsets.UTF_8));
+			signature.update(documentContent);
 
 			return signature.verify(signatureData);
 
