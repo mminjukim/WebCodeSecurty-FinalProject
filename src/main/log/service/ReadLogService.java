@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 import main.application.database.DBManager;
 import main.application.key.KeyFileService;
@@ -129,7 +130,7 @@ public class ReadLogService {
 	 * @param docId 로그를 열람할 문서 ID
 	 * @return 로그 내용
 	 */
-	public String viewLogs(int docId) {
+	public Optional<String> viewLogs(int docId) {
 		try (Connection conn = DBManager.getConnection()) {
 
 			// 로그 열람 권한 검증
@@ -138,8 +139,7 @@ public class ReadLogService {
 			// DB에서 로그 불러오기
 			List<ReadLogDto> logs = readLogDao.getLogsByDocId(conn, docId);
 			if (logs.isEmpty()) {
-				System.out.println("\n[알림] 기록된 로그가 없습니다.\n");
-				return null;
+				return Optional.empty();
 			}
 
 			// 로그 무결성 검증
@@ -150,7 +150,7 @@ public class ReadLogService {
 			for (ReadLogDto log : logs) {
 				sb.append(formatter.format(conn, log)).append("\n");
 			}
-			return sb.toString();
+			return Optional.of(sb.toString());
 
 		} catch (SQLException e) {
 			throw new SystemException(Error.DATABASE_ERROR, "로그 불러오기 오류");
