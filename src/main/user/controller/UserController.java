@@ -1,6 +1,7 @@
 package main.user.controller;
 
 import java.io.Console;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -49,29 +50,39 @@ public class UserController {
 			throw new SystemException(UserError.INVALID_ROLE_NO, "빈 역할 입력됨");
 		}
 
-		char[] password = console.readPassword("3. 비밀번호를 입력하세요: ");
-		if (password == null || password.length == 0) {
-			throw new SystemException(UserError.INVALID_INPUT, "빈 비밀번호 입력됨");
-		}
-
-		char[] confirmPassword = console.readPassword("4. 비밀번호를 다시 입력하세요: ");
-		if (confirmPassword == null || confirmPassword.length == 0) {
-			throw new SystemException(UserError.INVALID_INPUT, "빈 비밀번호 입력됨");
-		}
-
-		System.out.println("----------------------------------\n");
-
+		char[] password = null;
+		char[] confirmPassword = null;
 		try {
+			password = console.readPassword("3. 비밀번호를 입력하세요: ");
+			if (password == null || password.length == 0) {
+				throw new SystemException(UserError.INVALID_INPUT, "빈 비밀번호 입력됨");
+			}
+
+			confirmPassword = console.readPassword("4. 비밀번호를 다시 입력하세요: ");
+			if (confirmPassword == null || confirmPassword.length == 0) {
+				throw new SystemException(UserError.INVALID_INPUT, "빈 비밀번호 입력됨");
+			}
+
 			int roleNo = Integer.parseInt(roleInput.trim());
 			if (roleNo == 0) {
 				throw new SystemException(UserError.INVALID_ROLE_NO);
 			}
+			System.out.println("----------------------------------\n");
+
 			SignupRequestDto requestDto = new SignupRequestDto(username, password, confirmPassword, roleNo);
 			userService.signup(requestDto);
 			System.out.println("::: 회원가입 완료 ::: \n" + username + "님 환영합니다.");
 
 		} catch (NumberFormatException e) {
 			throw new SystemException(UserError.INVALID_ROLE_NO, "숫자만 입력");
+
+		} finally {
+			if (password != null) {
+				Arrays.fill(password, '\0');
+			}
+			if (confirmPassword != null) {
+				Arrays.fill(confirmPassword, '\0');
+			}
 		}
 	}
 
@@ -87,17 +98,26 @@ public class UserController {
 
 		System.out.print("아이디를 입력하세요: ");
 		String username = scanner.nextLine();
-		char[] password = console.readPassword("비밀번호를 입력하세요: ");
-		System.out.println("----------------------------------\n");
 
-		if ((username == null || username.trim().isEmpty()) || (password == null || password.length == 0)) {
-			throw new SystemException(UserError.INVALID_INPUT);
+		char[] password = null;
+		try {
+			password = console.readPassword("비밀번호를 입력하세요: ");
+
+			if ((username == null || username.trim().isEmpty()) || (password == null || password.length == 0)) {
+				throw new SystemException(UserError.INVALID_INPUT);
+			}
+			System.out.println("----------------------------------\n");
+
+			UserDto loginUser = userService.login(username, password);
+
+			System.out.println("::: 로그인 완료 ::: \n" + loginUser.getUsername() + "님 환영합니다.");
+			return loginUser;
+
+		} finally {
+			if (password != null) {
+				Arrays.fill(password, '\0');
+			}
 		}
-
-		UserDto loginUser = userService.login(username, password);
-
-		System.out.println("::: 로그인 완료 ::: \n" + loginUser.getUsername() + "님 환영합니다.");
-		return loginUser;
 	}
 
 	/**
