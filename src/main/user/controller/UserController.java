@@ -98,17 +98,26 @@ public class UserController {
 
 		System.out.print("아이디를 입력하세요: ");
 		String username = scanner.nextLine();
-		char[] password = console.readPassword("비밀번호를 입력하세요: ");
-		System.out.println("----------------------------------\n");
 
-		if ((username == null || username.trim().isEmpty()) || (password == null || password.length == 0)) {
-			throw new SystemException(UserError.INVALID_INPUT);
+		char[] password = null;
+		try {
+			password = console.readPassword("비밀번호를 입력하세요: ");
+
+			if ((username == null || username.trim().isEmpty()) || (password == null || password.length == 0)) {
+				throw new SystemException(UserError.INVALID_INPUT);
+			}
+			System.out.println("----------------------------------\n");
+
+			UserDto loginUser = userService.login(username, password);
+
+			System.out.println("::: 로그인 완료 ::: \n" + loginUser.getUsername() + "님 환영합니다.");
+			return loginUser;
+
+		} finally {
+			if (password != null) {
+				Arrays.fill(password, '\0');
+			}
 		}
-
-		UserDto loginUser = userService.login(username, password);
-
-		System.out.println("::: 로그인 완료 ::: \n" + loginUser.getUsername() + "님 환영합니다.");
-		return loginUser;
 	}
 
 	/**
