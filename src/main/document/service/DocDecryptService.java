@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -22,13 +21,13 @@ public class DocDecryptService {
 	private static final int IV_LENGTH = 16;
 
 	/**
-	 * 암호화된 문서를 읽어 비밀 키로 복호화해 문자열로 반환
+	 * 암호화된 문서를 읽어 비밀 키로 복호화해 바이트 배열로 반환
 	 *
 	 * @param inputFilePath  암호화된 문서 경로
 	 * @param secretKey      AES-256 비밀키
-	 * @return 복호화된 문서의 문자열 데이터
+	 * @return 복호화된 문서의 바이트 배열
 	 */
-	public String decryptDocument(String inputFilePath, SecretKey secretKey) {
+	public byte[] decryptDocument(String inputFilePath, SecretKey secretKey) {
 		try (FileInputStream fis = new FileInputStream(inputFilePath);
 				BufferedInputStream bis = new BufferedInputStream(fis);
 				ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
@@ -65,8 +64,8 @@ public class DocDecryptService {
 				bos.write(finalBytes);
 			}
 
-			//문자열로 반환
-			return bos.toString(StandardCharsets.UTF_8);
+			// 바이트 배열로 반환
+			return bos.toByteArray();
 
 		} catch (FileNotFoundException e) {
 			throw new SystemException(DocError.DOCUMENT_NOT_FOUND);

@@ -1,5 +1,6 @@
 package main.document.service;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -89,7 +90,7 @@ public class DocReadService {
 			);
 
 			// 비밀 키로 문서 및 전자서명 복호화
-			String content = decryptService.decryptDocument(
+			byte[] contentBytes = decryptService.decryptDocument(
 					buildPath(DocService.FileType.ENCRYPTED, doc.getTitle()),
 					secretKey
 			);
@@ -100,14 +101,15 @@ public class DocReadService {
 					.read(userDao.getPublicKeyPathById(conn, doc.getUploaderId()));
 
 			// 업로더 공개 키로 전자서명 검증
-			if (signatureService.verifySignature(content, signature, uploaderPublicKey) == false) {
+			if (signatureService.verifySignature(contentBytes, signature, uploaderPublicKey) == false) {
 				throw new SystemException(DocError.INVALID_DOC_SIGNATURE);
 			}
 
 			// 열람 로그 기록
 			readLogService.recordSuccessLog(docId);
 
-			return content;
+			// 복호화된 문서 바이트를 문자열로 반환
+			return new String(contentBytes, StandardCharsets.UTF_8);
 
 		} catch (SystemException e) {
 			// 에러 별로 실패 로그 기록
