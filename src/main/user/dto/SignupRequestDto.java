@@ -37,4 +37,10 @@ public class SignupRequestDto {
 	public int getRoleNo() {
 		return roleNo;
 	}
+
+	public void clearPassword() {
+		if (password != null) {
+			Arrays.fill(password, '\0');
+		}
+	}
 }
