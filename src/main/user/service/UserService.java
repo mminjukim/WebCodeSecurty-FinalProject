@@ -51,6 +51,8 @@ public class UserService {
 			}
 		} catch (SQLException e) {
 			throw new SystemException(Error.DATABASE_ERROR, "회원가입 처리 중 오류");
+		} finally {
+			request.clearPassword();
 		}
 	}
 

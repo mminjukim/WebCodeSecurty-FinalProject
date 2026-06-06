@@ -22,7 +22,7 @@ public class SignupRequestDto {
 		}
 
 		this.username = username;
-		this.password = password;
+		this.password = Arrays.copyOf(password, password.length);
 		this.roleNo = roleNo;
 	}
 
@@ -31,10 +31,16 @@ public class SignupRequestDto {
 	}
 
 	public char[] getPassword() {
-		return password;
+	    return Arrays.copyOf(password, password.length);
 	}
 
 	public int getRoleNo() {
 		return roleNo;
+	}
+
+	public void clearPassword() {
+		if (password != null) {
+			Arrays.fill(password, '\0');
+		}
 	}
 }
