@@ -19,6 +19,7 @@ import main.common.exception.SystemException;
 import main.document.dao.DocumentDao;
 import main.document.dto.DocumentDto;
 import main.document.exception.DocError;
+import main.log.domain.FailReason;
 import main.log.service.ReadLogService;
 import main.user.dao.RoleDao;
 import main.user.dao.UserDao;
@@ -113,15 +114,40 @@ public class DocReadService {
 
 		} catch (SystemException e) {
 			// 에러 별로 실패 로그 기록
-			readLogService.recordFailLog(docId, e);
+			readLogService.recordFailLog(docId, mapFailReason(e));
 			throw e;
 		} catch (SQLException e) {
-			readLogService.recordFailLog(docId, e);
+			readLogService.recordFailLog(docId, mapFailReason(e));
 			throw new SystemException(Error.DATABASE_ERROR);
 		}
 	}
 
 	private String buildPath(DocService.FileType type, String identifier) {
 		return Paths.get(DOC_ROOT, type.name(), identifier).toString();
+	}
+	
+	/**
+	 * 실패 사유 판별
+	 * 
+	 * @param 발생한 예외
+	 * @return 실패 사유
+	 */
+	private FailReason mapFailReason(Exception e) {
+		if (e instanceof SystemException se) {
+			if (se.getErrorCode() == DocError.NOT_AUTHORIZED) {
+				return FailReason.NO_PERMISSION;
+			}
+			if (se.getErrorCode() == DocError.DOCUMENT_NOT_FOUND) {
+				return FailReason.DOC_NOT_FOUND;
+			}
+			if (se.getErrorCode() == DocError.INVALID_DOC_SIGNATURE) {
+				return FailReason.SIGNATURE_INVALID;
+			}
+			if (se.getErrorCode() == DocError.DOCUMENT_DECRYPTION_FAILED
+					|| se.getErrorCode() == DocError.SIGNATURE_DECRYPTION_FAILED) {
+				return FailReason.DECRYPT_FAIL;
+			}
+		}
+		return FailReason.ERROR;
 	}
 }
