@@ -15,7 +15,7 @@ public class DocumentDto {
 		this.title = title;
 		this.uploaderId = uploaderId;
 		this.contentPath = contentPath; 
-		this.encryptedSignature = signature;
+		this.encryptedSignature = Arrays.copyOf(signature, signature.length);
 	}
 
 	public String getTitle() {

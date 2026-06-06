@@ -22,7 +22,7 @@ public class SignupRequestDto {
 		}
 
 		this.username = username;
-		this.password = password;
+		this.password = Arrays.copyOf(password, password.length);
 		this.roleNo = roleNo;
 	}
 

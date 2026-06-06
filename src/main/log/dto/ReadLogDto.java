@@ -24,7 +24,7 @@ public class ReadLogDto {
 		this.failReason = failReason;
 		this.prevHash = prevHash;
 		this.currentHash = currentHash;
-		this.signature = signature;
+		this.signature = Arrays.copyOf(signature, signature.length);
 		this.readAt = readAt;
 	}
 	
@@ -37,7 +37,7 @@ public class ReadLogDto {
 		this.failReason = failReason;
 		this.prevHash = prevHash;
 		this.currentHash = currentHash;
-		this.signature = signature;
+		this.signature = Arrays.copyOf(signature, signature.length);
 		this.readAt = readAt;
 	}
 
