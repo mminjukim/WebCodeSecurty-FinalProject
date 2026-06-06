@@ -13,8 +13,8 @@ import main.application.key.KeyFileService;
 import main.application.session.Session;
 import main.common.exception.Error;
 import main.common.exception.SystemException;
-import main.document.exception.DocError;
 import main.log.dao.ReadLogDao;
+import main.log.domain.FailReason;
 import main.log.dto.ReadLogDto;
 import main.user.dao.UserDao;
 import main.user.domain.UserRole;
@@ -40,13 +40,6 @@ public class ReadLogService {
 	 */
 	public enum Status {
 		SUCCESS, FAIL
-	}
-
-	/**
-	 * 열람 실패 이유
-	 */
-	public enum FailReason {
-		NONE, NO_PERMISSION, DOC_NOT_FOUND, SIGNATURE_INVALID, DECRYPT_FAIL, ERROR
 	}
 
 	public ReadLogService(Session session, ReadLogDao readLogDao, UserDao userDao, UserService userService,
@@ -76,8 +69,8 @@ public class ReadLogService {
 	 * @param docId      열람한 문서 ID
 	 * @param e			 발생한 예외
 	 */
-	public void recordFailLog(int docId, Exception e) {	
-		saveLog(docId, Status.FAIL, mapFailReason(e));
+	public void recordFailLog(int docId, FailReason failReason) {	
+		saveLog(docId, Status.FAIL, failReason);
 	}
 
 	/**
@@ -157,28 +150,4 @@ public class ReadLogService {
 		}
 	}
 	
-	/**
-	 * 실패 사유 판별
-	 * 
-	 * @param 발생한 예외
-	 * @return 실패 사유
-	 */
-	private FailReason mapFailReason(Exception e) {
-		if (e instanceof SystemException se) {
-			if (se.getErrorCode() == DocError.NOT_AUTHORIZED) {
-				return FailReason.NO_PERMISSION;
-			}
-			if (se.getErrorCode() == DocError.DOCUMENT_NOT_FOUND) {
-				return FailReason.DOC_NOT_FOUND;
-			}
-			if (se.getErrorCode() == DocError.INVALID_DOC_SIGNATURE) {
-				return FailReason.SIGNATURE_INVALID;
-			}
-			if (se.getErrorCode() == DocError.DOCUMENT_DECRYPTION_FAILED
-					|| se.getErrorCode() == DocError.SIGNATURE_DECRYPTION_FAILED) {
-				return FailReason.DECRYPT_FAIL;
-			}
-		}
-		return FailReason.ERROR;
-	}
 }
