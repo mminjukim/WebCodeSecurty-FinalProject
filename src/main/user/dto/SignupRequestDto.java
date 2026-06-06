@@ -31,7 +31,7 @@ public class SignupRequestDto {
 	}
 
 	public char[] getPassword() {
-		return password;
+	    return Arrays.copyOf(password, password.length);
 	}
 
 	public int getRoleNo() {

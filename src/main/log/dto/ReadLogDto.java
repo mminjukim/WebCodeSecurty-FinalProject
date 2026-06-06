@@ -1,5 +1,6 @@
 package main.log.dto;
 
+import java.util.Arrays;
 
 public class ReadLogDto {
 	private int id;                 
@@ -71,9 +72,9 @@ public class ReadLogDto {
 	public String getCurrentHash() {
 		return currentHash;
 	}
-
+	
 	public byte[] getSignature() {
-		return signature;
+	    return Arrays.copyOf(signature, signature.length);
 	}
 
 	public String getReadAt() {

@@ -1,6 +1,7 @@
 package main.document.dto;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 public class DocumentDto {
 	private int id;
@@ -30,6 +31,6 @@ public class DocumentDto {
 	}
 
 	public byte[] getSignature() {
-		return encryptedSignature;
+	    return Arrays.copyOf(encryptedSignature, encryptedSignature.length);
 	}
 }
