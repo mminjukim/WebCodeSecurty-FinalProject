@@ -1,6 +1,7 @@
 ## Introduction
 
-2026년 1학기 웹/코드보안 [팀-박시현] 기말 프로젝트입니다.
+2026년 1학기 웹/코드보안 [팀-박시현] 기말 프로젝트입니다. <br>
+장표: https://www.figma.com/deck/B6R7ccwMkW864ERFMOMax8
 
 ## Features
 
